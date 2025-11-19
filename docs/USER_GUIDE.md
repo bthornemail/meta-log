@@ -1,3 +1,11 @@
+---
+layout: default
+title: User Guide
+nav_order: 2
+description: "Complete guide for using meta-log"
+permalink: /USER_GUIDE
+---
+
 # meta-log User Guide
 
 Complete guide for using meta-log to interact with automaton systems.

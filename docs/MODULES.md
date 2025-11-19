@@ -1,3 +1,11 @@
+---
+layout: default
+title: Modules Documentation
+nav_order: 3
+description: "Complete reference for all meta-log modules"
+permalink: /MODULES
+---
+
 # meta-log Optional Modules
 
 This document describes the optional modules available in meta-log and how to use them.

@@ -99,6 +99,17 @@ QUESTION is a string containing the user's question."
     (message "%s" result)
     result))
 
+(defvar meta-log-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-c C-i") 'meta-log-initialize)
+    (define-key map (kbd "C-c C-a") 'meta-log-ask)
+    (define-key map (kbd "C-c C-e") 'meta-log-m-expr-eval)
+    (define-key map (kbd "C-c C-p") 'meta-log-prolog-query)
+    (define-key map (kbd "C-c C-d") 'meta-log-datalog-query)
+    (define-key map (kbd "C-c C-r") 'meta-log-r5rs-eval)
+    map)
+  "Keymap for meta-log-mode.")
+
 ;;;###autoload
 (defun meta-log-mode ()
   "Major mode for meta-log automaton systems.
@@ -110,17 +121,6 @@ Prolog, Datalog, and R5RS code."
   (setq mode-name "Meta-Log")
   (meta-log-m-expression-mode)
   (use-local-map meta-log-mode-map))
-
-(defvar meta-log-mode-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "C-c C-i") 'meta-log-initialize)
-    (define-key map (kbd "C-c C-a") 'meta-log-ask)
-    (define-key map (kbd "C-c C-e") 'meta-log-m-expr-eval)
-    (define-key map (kbd "C-c C-p") 'meta-log-prolog-query)
-    (define-key map (kbd "C-c C-d") 'meta-log-datalog-query)
-    (define-key map (kbd "C-c C-r") 'meta-log-r5rs-eval)
-    map)
-  "Keymap for meta-log-mode.")
 
 (provide 'meta-log)
 

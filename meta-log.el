@@ -1,7 +1,7 @@
 ;;; meta-log.el --- User-friendly abstraction layer for automaton systems
 
 ;; Copyright (C) 2025 Automaton System
-;; Author: Brandon Thorne <bthornemail@gmail.com>
+;; Author: Brian Thorne <bthornemail@gmail.com>
 ;; Version: 1.0.0
 ;; Package-Requires: ((emacs "28.1") (org "9.6") (geiser "0.18") (dash "2.19"))
 ;; Keywords: tools languages prolog datalog scheme lisp org

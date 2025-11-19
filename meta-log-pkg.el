@@ -8,8 +8,8 @@
     (dash "2.19"))
   :keywords '("tools" "languages" "prolog" "datalog" "scheme" "lisp" "org")
   :url "https://github.com/bthornemail/meta-log"
-  :authors '(("Brandon Thorne" . "bthornemail@gmail.com"))
-  :maintainer '("Brandon Thorne" . "bthornemail@gmail.com"))
+  :authors '(("Brian Thorne" . "bthornemail@gmail.com"))
+  :maintainer '("Brian Thorne" . "bthornemail@gmail.com"))
 
 ;;; meta-log-pkg.el ends here
 

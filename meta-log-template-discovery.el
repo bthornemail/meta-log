@@ -168,7 +168,7 @@ Returns list of matching templates."
                                      :similarity-score similarity)))
                       (push template templates)))))))))
     (kill-buffer buffer)
-    templates))
+    templates)))
 
 (defun meta-log-template-discovery-calculate-similarity (keywords text)
   "Calculate similarity between keywords and text.

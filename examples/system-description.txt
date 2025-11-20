@@ -1,0 +1,19 @@
+META-LOG SYSTEM SELF-DESCRIPTION
+=================================
+
+meta-log v1.0.0 is a 7D-dimensional automaton system with components:
+  - meta-log-core (database-abstraction, 3D)
+  - meta-log-prolog (logic-engine, 6D)
+  - meta-log-datalog (logic-engine, 6D)
+  - meta-log-r5rs (evaluation-engine, 7D)
+  - meta-log-wordnet (semantic-engine, 6D)
+  - meta-log-template-discovery (template-engine, 7D)
+  - meta-log-federation (network-layer, 4D)
+  - meta-log-metacircular (self-reference, 7D)
+
+Capabilities: self-modifying, self-encoding, self-bootstrapping
+
+FULL ENCODING:
+==============
+
+(:type automaton-system :name "meta-log" :version "1.0.0" :dimension "7D" :components ((:name meta-log-core :type database-abstraction :dimension "3D" :provides (meta-log-db meta-log-get-db meta-log-core-initialize)) (:name meta-log-prolog :type logic-engine :dimension "6D" :provides (meta-log-prolog-query meta-log-prolog-add-fact)) (:name meta-log-datalog :type logic-engine :dimension "6D" :provides (meta-log-datalog-query meta-log-datalog-add-fact)) (:name meta-log-r5rs :type evaluation-engine :dimension "7D" :provides (meta-log-r5rs-eval meta-log-r5rs-call)) (:name meta-log-wordnet :type semantic-engine :dimension "6D" :provides (meta-log-wordnet-extract-keywords meta-log-wordnet-semantic-similarity)) (:name meta-log-template-discovery :type template-engine :dimension "7D" :provides (meta-log-discover-template meta-log-template-discovery-build-canvasl)) (:name meta-log-federation :type network-layer :dimension "4D" :provides (meta-log-federation-init meta-log-federation-sync)) (:name meta-log-metacircular :type self-reference :dimension "7D" :provides (meta-log-encode-self meta-log-modify-self meta-log-bootstrap-self))) :can-modify-self t :can-generate-self t :can-bootstrap-self t :meta-properties (:evaluates-itself t :represents-itself t :generates-templates-about-itself t :modifies-own-code t))

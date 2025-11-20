@@ -1,0 +1,20 @@
+@version 1.0
+@schema canvasl
+@dimension 0D
+@generated 2025-11-19T20:09:04Z
+
+* Peer Identity Management With Webauthn
+:PROPERTIES:
+:CANVASL_CID: template-365961
+:CANVASL_DIMENSION: 0D
+:CANVASL_SEMANTIC_FIELD: network-identity
+:END:
+
+# peer identity management with WebAuthn
+
+peer identity management with WebAuthn
+
+## Canvas API Mappings
+
+- **peer**: navigator.webrtc.createPeerConnection()
+- **identity**: navigator.webauthn.create()

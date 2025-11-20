@@ -25,3 +25,4 @@ mosquitto/log/
 
 # Logs
 *.log
+automaton-evolutions/.git

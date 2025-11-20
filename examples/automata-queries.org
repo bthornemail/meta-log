@@ -1,0 +1,157 @@
+#+TITLE: Automata Query Examples
+#+AUTHOR: meta-log
+#+DATE: 2025-01-19
+
+* Setup
+
+First, initialize meta-log and load the automata:
+
+#+BEGIN_SRC emacs-lisp :results output
+;; Add meta-log to load-path if needed
+(add-to-list 'load-path "/data/data/com.termux/files/home/github/meta-log")
+
+;; Load and initialize meta-log
+(require 'meta-log)
+(meta-log-initialize)
+
+;; Load automata from examples folder
+(meta-log-load-all-automata
+ "/data/data/com.termux/files/home/github/meta-log/examples/automaton-evolutions")
+
+(message "meta-log initialized and automata loaded!")
+#+END_SRC
+
+* Query Examples
+
+** Prolog Queries
+
+*** Find All Nodes
+
+Query all nodes loaded from the automata files:
+
+#+BEGIN_SRC meta-log-prolog :results output
+?- node(?Id, ?Type).
+#+END_SRC
+
+*** Find Nodes by Dimension
+
+Find all 0-dimensional nodes:
+
+#+BEGIN_SRC meta-log-prolog :results output
+?- dimension(?Id, "0D").
+#+END_SRC
+
+*** Find All Edges
+
+Query all edges between nodes:
+
+#+BEGIN_SRC meta-log-prolog :results output
+?- edge(?EdgeId, ?FromNode, ?ToNode).
+#+END_SRC
+
+*** Complex Query: Nodes and Their Dimensions
+
+#+BEGIN_SRC meta-log-prolog :results output
+node(?Id, ?Type), dimension(?Id, ?Dim).
+#+END_SRC
+
+** Datalog Queries
+
+*** All Nodes (Datalog)
+
+#+BEGIN_SRC meta-log-datalog :results table
+?- node(?Id, ?Type).
+#+END_SRC
+
+*** Dimensions (Datalog)
+
+#+BEGIN_SRC meta-log-datalog :results table
+?- dimension(?Id, ?Dimension).
+#+END_SRC
+
+*** Edges (Datalog)
+
+#+BEGIN_SRC meta-log-datalog :results table
+?- edge(?EdgeId, ?FromNode, ?ToNode).
+#+END_SRC
+
+** M-Expression Queries
+
+*** Query Nodes by Dimension
+
+#+BEGIN_SRC meta-log-m-expr :results value
+query[find[all[nodes]; where[dimension[?X; "0D"]]]]
+#+END_SRC
+
+*** Find Connected Nodes
+
+#+BEGIN_SRC meta-log-m-expr :results value
+query[find[all[edges]; where[edge[?E; ?From; ?To]]]]
+#+END_SRC
+
+** Natural Language Queries
+
+*** Ask About Nodes
+
+#+BEGIN_SRC emacs-lisp :results output
+(meta-log-ask "What nodes are in the automaton system?")
+#+END_SRC
+
+*** Ask About Dimensions
+
+#+BEGIN_SRC emacs-lisp :results output
+(meta-log-ask "Show me all nodes in dimension 5D")
+#+END_SRC
+
+*** Ask About Relationships
+
+#+BEGIN_SRC emacs-lisp :results output
+(meta-log-ask "What edges connect the nodes?")
+#+END_SRC
+
+* Interactive Commands
+
+You can also use these commands interactively:
+
+** M-x meta-log-prolog-query
+Type a Prolog query like: =node(?Id, ?Type)=
+
+** M-x meta-log-datalog-query
+Type a Datalog query like: =dimension(?Id, ?Dim)=
+
+** M-x meta-log-ask
+Ask in natural language: =What are all the automata nodes?=
+
+** M-x meta-log-m-expr-eval
+Evaluate M-expressions: =query[find[all[nodes]]]]=
+
+* Understanding the Automata Data
+
+When you load the .canvasl files, they contain JSONL data that gets parsed into facts:
+
+- *node(Id, Type)* - Each automaton node with its type
+- *dimension(Id, Dimension)* - Dimensional assignments (0D, 1D, 2D, etc.)
+- *edge(EdgeId, FromNode, ToNode)* - Connections between nodes
+
+The 12 loaded automata files represent different automaton evolutions:
+- a0-unified-automaton.canvasl
+- a1-automaton-kernel-seed.canvasl
+- a2-metaverse-shape.canvasl
+- a3-metaverse-centroid.canvasl
+- a4-autonomous-basis.canvasl
+- a5-sheaf-gluer.canvasl
+- a6-homology-checker.canvasl
+- a7-webauthn-oracle.canvasl
+- a8-bip32-keymaster.canvasl
+- a9-webrtc-messenger.canvasl
+- a10-mqtt-herald.canvasl
+- a11-master.canvasl
+
+* Keybindings (in meta-log-mode)
+
+- =C-c C-i= - Initialize meta-log
+- =C-c C-a= - Ask natural language question
+- =C-c C-e= - Evaluate M-expression
+- =C-c C-p= - Execute Prolog query
+- =C-c C-d= - Execute Datalog query
+- =C-c C-r= - Evaluate R5RS expression

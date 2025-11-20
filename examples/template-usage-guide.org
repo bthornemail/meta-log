@@ -1,0 +1,356 @@
+#+TITLE: Template Discovery & Federation Usage Guide
+#+AUTHOR: meta-log
+#+DATE: 2025-01-19
+
+* Overview
+
+The template modules enable:
+1. **Template Discovery** - Find and generate templates using natural language
+2. **Template Federation** - Share templates across peers
+3. **Semantic Matching** - Use WordNet for intelligent keyword matching
+4. **Canvas API Mapping** - Generate Web API code from templates
+
+* Prerequisites
+
+First, you need to load the template modules (they're optional):
+
+#+BEGIN_SRC emacs-lisp :results output
+;; Add meta-log to load-path
+(add-to-list 'load-path "/data/data/com.termux/files/home/github/meta-log")
+
+;; Load core meta-log
+(require 'meta-log)
+
+;; Load all required dependencies for templates
+(require 'meta-log-wordnet)
+(require 'meta-log-canvas-api)
+(require 'meta-log-collective-intelligence)
+(require 'meta-log-federation)
+(require 'meta-log-mqtt)
+
+;; Load template modules
+(require 'meta-log-template-discovery)
+(require 'meta-log-template-federation)
+
+(message "Template modules loaded!")
+#+END_SRC
+
+* Template Discovery (Without Federation)
+
+** Basic Template Discovery
+
+Discover templates using natural language:
+
+#+BEGIN_SRC emacs-lisp :results output
+;; Initialize meta-log first
+(meta-log-initialize)
+
+;; Discover templates about peer identity
+(let ((templates (meta-log-discover-template "peer identity management")))
+  (message "Found %d template(s)" (length templates))
+  (dolist (template templates)
+    (message "")
+    (message "Template: %s" (meta-log-template-name template))
+    (message "  ID: %s" (meta-log-template-id template))
+    (message "  Dimension: %s" (meta-log-template-dimension template))
+    (message "  Similarity: %.2f" (meta-log-template-similarity-score template))))
+#+END_SRC
+
+** Discover Templates About Cryptography
+
+#+BEGIN_SRC emacs-lisp :results output
+(let ((templates (meta-log-discover-template "crypto key management")))
+  (when templates
+    (let ((best (car templates)))
+      (message "Best match: %s" (meta-log-template-name best))
+      (message "Dimension: %s" (meta-log-template-dimension best))
+      (message "Semantic field: %s" (meta-log-template-semantic-field best)))))
+#+END_SRC
+
+** Discover Templates About Networking
+
+#+BEGIN_SRC emacs-lisp :results output
+(let ((templates (meta-log-discover-template "network synchronization protocol")))
+  (when templates
+    (message "Found %d templates about networking" (length templates))
+    (dolist (template templates)
+      (message "- %s (%.2f similarity)"
+               (meta-log-template-name template)
+               (meta-log-template-similarity-score template)))))
+#+END_SRC
+
+** Generate CanvasL Template
+
+#+BEGIN_SRC emacs-lisp :results output
+;; Discover and generate CanvasL
+(let ((templates (meta-log-discover-template "blockchain consensus")))
+  (when templates
+    (let ((best (car templates)))
+      ;; Build CanvasL content
+      (let ((canvasl (meta-log-template-discovery-build-canvasl best)))
+        ;; Display in buffer
+        (with-output-to-temp-buffer "*meta-log-template*"
+          (princ canvasl))
+        (message "CanvasL template generated in buffer *meta-log-template*")
+
+        ;; Optionally save to file
+        (meta-log-template-discovery-save-template
+         best
+         "/data/data/com.termux/files/home/github/meta-log/examples/generated-template.canvasl")
+        (message "Template saved to examples/generated-template.canvasl")))))
+#+END_SRC
+
+* Template Discovery with Federation
+
+** Setup Federation First
+
+Before using federation features, initialize federation:
+
+#+BEGIN_SRC emacs-lisp :results output
+;; Setup federation with MQTT broker
+(let ((blackboard "~/.emacs.d/meta-log/federation-blackboard.org")
+      (mqtt-broker (or (getenv "META_LOG_MQTT_BROKER")
+                       "mqtt://localhost:1883")))
+  (meta-log-federation-init blackboard mqtt-broker)
+  (message "Federation initialized!"))
+
+;; Setup template federation
+(meta-log-template-federation-setup)
+(message "Template federation enabled!")
+#+END_SRC
+
+** Discover Templates Using Federation
+
+Now discover templates from federation peers:
+
+#+BEGIN_SRC emacs-lisp :results output
+;; The 't' parameter enables federation queries
+(let ((templates (meta-log-discover-template "peer identity management" t)))
+  (message "Found %d template(s) (including from federation)" (length templates))
+  (dolist (template templates)
+    (message "")
+    (message "Template: %s" (meta-log-template-name template))
+    (message "  Dimension: %s" (meta-log-template-dimension template))
+    (message "  Similarity: %.2f" (meta-log-template-similarity-score template))
+    (when (meta-log-template-org-file template)
+      (message "  Source: %s" (meta-log-template-org-file template)))))
+#+END_SRC
+
+** Query Federation for Specific Templates
+
+#+BEGIN_SRC emacs-lisp :results output
+;; Query only federation (not local)
+(let ((templates (meta-log-template-federation-query-templates
+                  "WebRTC peer connection"
+                  "4D"))) ; Dimension filter
+  (message "Found %d templates from federation peers" (length templates))
+  (dolist (template templates)
+    (message "- %s" (meta-log-template-name template))))
+#+END_SRC
+
+** Share Your Template with Federation
+
+#+BEGIN_SRC emacs-lisp :results output
+;; First, discover or create a template
+(let ((templates (meta-log-discover-template "custom automaton template")))
+  (when templates
+    (let ((template (car templates)))
+      ;; Share with federation
+      (meta-log-template-federation-share-template template)
+      (message "Template '%s' shared with federation!"
+               (meta-log-template-name template)))))
+#+END_SRC
+
+* Using the Demo Function
+
+The easiest way to try template discovery:
+
+#+BEGIN_SRC emacs-lisp :results output
+;; Load the demo
+(load-file "/data/data/com.termux/files/home/github/meta-log/examples/template-discovery-demo.el")
+
+;; Run demo
+(meta-log-template-discovery-demo "peer identity management with WebAuthn")
+#+END_SRC
+
+* Interactive Commands
+
+You can also run these interactively:
+
+** M-x meta-log-discover-template
+Prompts for a description and discovers templates
+
+** M-x meta-log-template-discovery-demo
+Runs the full demo with detailed output
+
+* Understanding Template Structure
+
+Templates have these fields:
+
+- =:id= - Unique template identifier
+- =:name= - Human-readable name
+- =:description= - Template description
+- =:keywords= - List of keywords (from WordNet)
+- =:dimension= - Dimensional assignment (0D-7D)
+- =:semantic-field= - Semantic classification
+- =:org-file= - Source Org Mode file (if any)
+- =:canvas-api-mappings= - Web API mappings
+- =:similarity-score= - Match quality (0.0-1.0)
+
+* Creating Template Files in Org Mode
+
+You can create your own template files that will be discovered:
+
+** Example Template File Structure
+
+Create files in =~/.emacs.d/meta-log/templates/=:
+
+#+BEGIN_EXAMPLE
+,* Peer Identity Management Template
+:PROPERTIES:
+:CANVASL_CID: template-peer-identity-001
+:CANVASL_DIMENSION: 5D
+:CANVASL_SEMANTIC_FIELD: network-identity
+:END:
+
+Template for managing peer identities with cryptographic keys.
+
+,** Keywords
+- peer
+- identity
+- management
+- crypto
+- WebAuthn
+
+,** Canvas API Mappings
+- webauthn.create()
+- indexeddb.put()
+- crypto.subtle.generateKey()
+
+,#+BEGIN_SRC meta-log-prolog
+peer-identity(?Peer, ?PublicKey, ?Credential).
+verify-peer(?Peer, ?Signature).
+,#+END_SRC
+#+END_EXAMPLE
+
+* Canvas API Integration
+
+Templates can map to Web Canvas APIs:
+
+#+BEGIN_SRC emacs-lisp :results output
+;; Keywords are mapped to Canvas APIs:
+;; "peer" → webrtc.createPeerConnection()
+;; "identity" → webauthn.create()
+;; "location" → geolocation.getCurrentPosition()
+;; "notify" → notifications.showNotification()
+;; "storage" → indexeddb.put()
+;; "camera" → mediaDevices.getUserMedia()
+#+END_SRC
+
+* WordNet Semantic Analysis
+
+Templates use WordNet for intelligent matching:
+
+#+BEGIN_SRC emacs-lisp :results output
+;; Extract keywords from natural language
+(let ((keywords (meta-log-wordnet-extract-keywords "peer identity management")))
+  (message "Keywords extracted:")
+  (dolist (keyword keywords)
+    (message "  - %s (dimension: %s, field: %s)"
+             (plist-get keyword :word)
+             (plist-get keyword :dimension)
+             (plist-get keyword :semantic-field))))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :results output
+;; Map description to dimension
+(let ((dimension (meta-log-wordnet-map-to-dimension "consensus blockchain")))
+  (message "Mapped to dimension: %s" dimension))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :results output
+;; Calculate semantic similarity
+(let ((similarity (meta-log-wordnet-semantic-similarity
+                   "peer identity management"
+                   "node self administration")))
+  (message "Semantic similarity: %.2f" similarity))
+#+END_SRC
+
+* Dimension Mappings
+
+Templates are mapped to dimensions:
+
+- **0D** - Point/Identity (peer, node, agent)
+- **1D** - Temporal/Sequence (time, order, sequence)
+- **2D** - Spatial/Structure (location, layout, structure)
+- **3D** - Volume/Container (storage, database, collection)
+- **4D** - Network/Graph (connection, mesh, federation)
+- **5D** - Consensus/Agreement (vote, decision, blockchain)
+- **6D** - Meta/Reflection (analysis, reasoning, verification)
+- **7D** - Universal/Complete (system, automaton, meta-system)
+
+* Example Workflows
+
+** Workflow 1: Find and Use a Template
+
+1. Describe what you want in natural language
+2. Discover templates using =meta-log-discover-template=
+3. Review similarity scores
+4. Generate CanvasL from best match
+5. Save template file
+
+** Workflow 2: Share Template with Peers
+
+1. Create or discover a template
+2. Initialize federation
+3. Share template with =meta-log-template-federation-share-template=
+4. Template becomes available to all peers
+
+** Workflow 3: Build from Federation
+
+1. Initialize federation
+2. Query peers for templates
+3. Aggregate multiple templates
+4. Generate combined CanvasL
+5. Share improved template back
+
+* Environment Variables
+
+Set these for federation:
+
+#+BEGIN_SRC bash
+export META_LOG_MQTT_BROKER="mqtt://broker.example.com:1883"
+export META_LOG_AUTOMATA_PATH="/path/to/automaton-evolutions"
+#+END_SRC
+
+* Tips
+
+1. **Use descriptive language** - The more specific your description, the better the match
+2. **Check similarity scores** - Scores above 0.7 are good matches
+3. **Combine templates** - You can merge multiple templates manually
+4. **Share successful templates** - Help the federation learn
+5. **Create template libraries** - Organize templates in Org Mode files
+
+* Troubleshooting
+
+** No templates found
+- Check if template directories exist (~/.emacs.d/meta-log/templates)
+- Verify WordNet is working
+- Try broader search terms
+
+** Federation not working
+- Check MQTT broker is running and accessible
+- Verify federation is initialized
+- Check peer connections
+
+** Canvas API mappings missing
+- Some keywords may not have Canvas API mappings yet
+- You can add custom mappings in meta-log-canvas-api.el
+
+* Next Steps
+
+See the full documentation:
+- =docs/TEMPLATE-DISCOVERY-BRIDGE.md= - Complete architecture
+- =examples/template-discovery-demo.el= - Demo code
+- =meta-log-wordnet.el= - WordNet integration
+- =meta-log-canvas-api.el= - Canvas API mappings

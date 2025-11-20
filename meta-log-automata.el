@@ -31,9 +31,9 @@ Returns path to package directory or nil."
 PACKAGE-PATH is the path to automaton-evolutions package.
 Returns list of file paths."
   (let ((files '())
-        (dist-path (expand-file-name "dist" package-path)))
-    (when (file-exists-p dist-path)
-      (dolist (file (directory-files dist-path t "\\.canvasl$"))
+        (files-path (expand-file-name "files" package-path)))
+    (when (file-exists-p files-path)
+      (dolist (file (directory-files files-path t "\\.canvasl$"))
         (push file files)))
     (nreverse files)))
 

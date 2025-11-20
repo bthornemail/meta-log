@@ -16,6 +16,7 @@ Thumbs.db
 *.swp
 
 # Project specific
+automaton-evolutions/.git
 federation-data/
 metaverse-data/
 mosquitto/data/
@@ -25,4 +26,3 @@ mosquitto/log/
 
 # Logs
 *.log
-automaton-evolutions/.git

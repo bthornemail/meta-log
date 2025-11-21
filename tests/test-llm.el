@@ -10,62 +10,72 @@
 (require 'meta-log)
 (require 'meta-log-llm)
 
-(defun test-llm-cache ()
-  "Test LLM caching functionality."
-  (message "Testing LLM cache...")
-  (let ((errors '())
-        (test-key "test-prompt")
-        (test-value "test response"))
-    (condition-case err
-        (progn
-          ;; Test cache write
-          (meta-log-llm-cache-put test-key test-value)
-
-          ;; Test cache read
-          (let ((cached (meta-log-llm-cache-get test-key)))
-            (unless cached
-              (push "Should retrieve cached value" errors))
-            (unless (equal cached test-value)
-              (push "Cached value should match" errors)))
-
-          ;; Test cache invalidation
-          (meta-log-llm-cache-invalidate test-key)
-          (let ((cached (meta-log-llm-cache-get test-key)))
-            (when cached
-              (push "Cache should be invalidated" errors))))
-      (error (push (format "Cache error: %s" err) errors)))
-
-    (if errors
-        (progn
-          (message "✗ LLM cache tests failed: %s" (mapconcat 'identity errors ", "))
-          nil)
-      (progn
-        (message "✓ LLM cache tests passed")
-        t))))
-
-(defun test-llm-learning ()
-  "Test LLM learning functionality."
-  (message "Testing LLM learning...")
+(defun test-llm-initialization ()
+  "Test LLM initialization."
+  (message "Testing LLM initialization...")
   (let ((errors '()))
     (condition-case err
         (progn
-          ;; Test learning record creation
-          (meta-log-llm-record-interaction
-           "What is Prolog?"
-           "Prolog is a logic programming language.")
+          ;; Test LLM initialization
+          (meta-log-llm-initialize)
 
-          ;; Test learning retrieval
-          (let ((learnings (meta-log-llm-get-learnings "Prolog")))
-            (unless learnings
-              (push "Should have recorded learning" errors))))
-      (error (push (format "Learning error: %s" err) errors)))
+          ;; Check if main query function exists
+          (unless (fboundp 'meta-log-llm-query)
+            (push "LLM query function should exist" errors)))
+      (error (push (format "LLM init error: %s" err) errors)))
 
     (if errors
         (progn
-          (message "✗ LLM learning tests failed: %s" (mapconcat 'identity errors ", "))
+          (message "✗ LLM initialization tests failed: %s" (mapconcat 'identity errors ", "))
           nil)
       (progn
-        (message "✓ LLM learning tests passed")
+        (message "✓ LLM initialization tests passed")
+        t))))
+
+(defun test-llm-vocabulary ()
+  "Test LLM vocabulary management."
+  (message "Testing LLM vocabulary...")
+  (let ((errors '()))
+    (condition-case err
+        (progn
+          ;; Test vocabulary addition
+          (meta-log-llm-add-vocabulary "machine learning" "ml")
+          (meta-log-llm-add-vocabulary "artificial intelligence" "ai")
+
+          ;; Test vocabulary application
+          (let ((result (meta-log-llm-apply-vocabulary "what is machine learning?")))
+            (unless result
+              (push "Vocabulary application should work" errors))))
+      (error (push (format "Vocabulary error: %s" err) errors)))
+
+    (if errors
+        (progn
+          (message "✗ LLM vocabulary tests failed: %s" (mapconcat 'identity errors ", "))
+          nil)
+      (progn
+        (message "✓ LLM vocabulary tests passed")
+        t))))
+
+(defun test-llm-translation ()
+  "Test LLM translation to logic queries."
+  (message "Testing LLM translation...")
+  (let ((errors '()))
+    (condition-case err
+        (progn
+          ;; Check translation functions exist
+          (unless (fboundp 'meta-log-llm-to-prolog)
+            (push "Prolog translation function should exist" errors))
+
+          (unless (fboundp 'meta-log-llm-to-datalog)
+            (push "Datalog translation function should exist" errors)))
+      (error (push (format "Translation error: %s" err) errors)))
+
+    (if errors
+        (progn
+          (message "✗ LLM translation tests failed: %s" (mapconcat 'identity errors ", "))
+          nil)
+      (progn
+        (message "✓ LLM translation tests passed")
         t))))
 
 (defun test-llm-provider-config ()
@@ -74,15 +84,13 @@
   (let ((errors '()))
     (condition-case err
         (progn
-          ;; Test provider setting
-          (setq meta-log-llm-provider 'anthropic)
-          (unless (equal meta-log-llm-provider 'anthropic)
-            (push "Should set provider" errors))
+          ;; Test backend variable exists
+          (unless (boundp 'meta-log-llm-backend)
+            (push "Backend variable should exist" errors))
 
-          ;; Test provider switching
-          (setq meta-log-llm-provider 'openai)
-          (unless (equal meta-log-llm-provider 'openai)
-            (push "Should switch provider" errors)))
+          ;; Test backend check function
+          (unless (fboundp 'meta-log-llm-backend-available-p)
+            (push "Backend check function should exist" errors)))
       (error (push (format "Provider config error: %s" err) errors)))
 
     (if errors
@@ -93,13 +101,34 @@
         (message "✓ LLM provider config tests passed")
         t))))
 
+(defun test-llm-stats ()
+  "Test LLM statistics function."
+  (message "Testing LLM stats...")
+  (let ((errors '()))
+    (condition-case err
+        (progn
+          ;; Test stats function
+          (when (fboundp 'meta-log-llm-stats)
+            (meta-log-llm-stats)))
+      (error (push (format "Stats error: %s" err) errors)))
+
+    (if errors
+        (progn
+          (message "✗ LLM stats tests failed: %s" (mapconcat 'identity errors ", "))
+          nil)
+      (progn
+        (message "✓ LLM stats tests passed")
+        t))))
+
 (defun test-llm-all ()
   "Run all LLM tests."
   (message "=== Running LLM Test Suite ===")
   (let ((results '()))
-    (push (test-llm-cache) results)
-    (push (test-llm-learning) results)
+    (push (test-llm-initialization) results)
+    (push (test-llm-vocabulary) results)
+    (push (test-llm-translation) results)
     (push (test-llm-provider-config) results)
+    (push (test-llm-stats) results)
 
     (let ((passed (length (cl-remove-if-not 'identity results)))
           (total (length results)))

@@ -32,8 +32,12 @@
 (defun meta-log-m-expr-parse (m-expr-string)
   "Parse an M-expression string into an S-expression.
 M-EXPR-STRING format: \"eval[expr; env]\""
-  (let ((tokens (meta-log-m-expr-tokenize m-expr-string)))
-    (meta-log-m-expr-parse-tokens tokens)))
+  (let* ((tokens (meta-log-m-expr-tokenize m-expr-string))
+         (parsed (meta-log-m-expr-parse-tokens tokens)))
+    ;; Unwrap nested single-element lists
+    (while (and (listp parsed) (= (length parsed) 1) (listp (car parsed)))
+      (setq parsed (car parsed)))
+    parsed))
 
 (defun meta-log-m-expr-tokenize (string)
   "Tokenize an M-expression string.
@@ -81,29 +85,33 @@ Returns list of tokens."
 (defun meta-log-m-expr-parse-args (tokens)
   "Parse arguments until closing bracket.
 Returns (args . remaining-tokens)."
-  (let ((args '())
-        (current '())
-        (tokens tokens))
-    (while tokens
-      (let ((token (car tokens))
-            (rest (cdr tokens)))
-        (cond
-         ((eq token 'close-bracket)
-          (if current
-              (setq args (cons (nreverse current) args)))
-          (cl-return (cons (nreverse args) rest)))
-         ((eq token 'semicolon)
-          (if current
-              (setq args (cons (nreverse current) args)
-                    current '())))
-         ((eq token 'open-bracket)
-          (let ((nested (meta-log-m-expr-parse-args rest)))
-            (push (car nested) current)
-            (setq rest (cdr nested))))
-         (t
-          (push token current)))
-        (setq tokens rest)))
-    (cons (nreverse args) nil)))
+  (catch 'done
+    (let ((args '())
+          (current '())
+          (tokens tokens))
+      (while tokens
+        (let ((token (car tokens))
+              (rest (cdr tokens)))
+          (cond
+           ((eq token 'close-bracket)
+            (if current
+                (setq args (cons (nreverse current) args)))
+            (throw 'done (cons (nreverse args) rest)))
+           ((eq token 'semicolon)
+            (if current
+                (setq args (cons (nreverse current) args)
+                      current '())))
+           ((eq token 'open-bracket)
+            (let ((nested (meta-log-m-expr-parse-args rest)))
+              (push (car nested) current)
+              (setq rest (cdr nested))))
+           (t
+            (push token current)))
+          (setq tokens rest)))
+      ;; If we get here, no closing bracket found
+      (if current
+          (setq args (cons (nreverse current) args)))
+      (cons (nreverse args) nil))))
 
 (defun meta-log-m-expr-eval (m-expr)
   "Evaluate an M-expression.
@@ -132,10 +140,22 @@ M-EXPR can be a string or parsed S-expression."
         (meta-log-m-expr-eval-datalog args))
        ((string-prefix-p "church-" fun)
         (meta-log-m-expr-eval-church fun args))
+       ;; Basic arithmetic
+       ((member fun '("+" "-" "*" "/"))
+        (apply (intern fun) (mapcar #'meta-log-m-expr-str-to-number args)))
        (t
         (error "Unknown M-expression function: %s" fun)))))
    (t
     s-expr)))
+
+(defun meta-log-m-expr-str-to-number (str)
+  "Convert string STR to number, or return as-is if not a number."
+  (if (stringp str)
+      (let ((num (string-to-number str)))
+        (if (and (= num 0) (not (string-match-p "^0+\\.?0*$" str)))
+            str  ; Not a valid number, return string
+          num))
+    str))
 
 (defun meta-log-m-expr-eval-eval (args)
   "Evaluate eval[expr; env] M-expression."

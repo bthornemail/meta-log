@@ -25,16 +25,18 @@
 (defun meta-log-prolog-variable-p (term)
   "Check if TERM is a Prolog variable.
 Variables start with ? or are uppercase symbols."
-  (or (and (stringp term)
-           (string-match-p "^?[A-Za-z]" term))
-      (and (symbolp term)
-           (let ((name (symbol-name term)))
-             (or (string-match-p "^?" name)
-                 (string-match-p "^[A-Z]" name))))))
+  (let ((case-fold-search nil))  ; Case-sensitive matching
+    (and (or (and (stringp term)
+                  (numberp (string-match-p "^?[A-Za-z]" term)))
+             (and (symbolp term)
+                  (let ((name (symbol-name term)))
+                    (or (numberp (string-match-p "^?" name))
+                        (numberp (string-match-p "^[A-Z]" name))))))
+         t)))
 
 (defun meta-log-prolog-unify (x y bindings)
   "Unify two terms X and Y with existing BINDINGS.
-Returns new bindings or nil if unification fails."
+Returns new bindings or :failed if unification fails."
   (cond
    ((equal x y) bindings)
    ((meta-log-prolog-variable-p x)
@@ -43,12 +45,14 @@ Returns new bindings or nil if unification fails."
     (meta-log-prolog-bind y x bindings))
    ((and (listp x) (listp y))
     (let ((b1 (meta-log-prolog-unify (car x) (car y) bindings)))
-      (and b1 (meta-log-prolog-unify (cdr x) (cdr y) b1))))
-   (t nil)))
+      (if (eq b1 :failed)
+          :failed
+        (meta-log-prolog-unify (cdr x) (cdr y) b1))))
+   (t :failed)))
 
 (defun meta-log-prolog-bind (var val bindings)
   "Bind variable VAR to value VAL in BINDINGS.
-Returns new bindings or nil if binding fails."
+Returns new bindings or :failed if binding fails."
   (let ((existing (assoc var bindings)))
     (if existing
         (meta-log-prolog-unify (cdr existing) val bindings)
@@ -57,6 +61,7 @@ Returns new bindings or nil if binding fails."
 (defun meta-log-prolog-subst (bindings term)
   "Substitute variables in TERM with values from BINDINGS."
   (cond
+   ((null term) term)  ; Handle nil/empty list explicitly
    ((meta-log-prolog-variable-p term)
     (let ((binding (assoc term bindings)))
       (if binding
@@ -71,7 +76,8 @@ Returns new bindings or nil if binding fails."
   "Add a fact to the Prolog database.
 PREDICATE is the predicate name, ARGS are the arguments."
   (let ((fact (cons predicate args)))
-    (setq meta-log-prolog--db (cons (list fact) meta-log-prolog--db))
+    ;; Store fact directly as a clause with empty body
+    (setq meta-log-prolog--db (cons fact meta-log-prolog--db))
     fact))
 
 (defun meta-log-prolog-add-rule (head &rest body)
@@ -94,27 +100,37 @@ Returns list of binding sets (alists)."
   "Resolve a GOAL against CLAUSES with BINDINGS and PROOF.
 Returns list of solutions (binding sets)."
   (if (null clauses)
-      (if (null bindings)
-          '()
-        (list (cons bindings proof)))
+      '()  ; No more clauses to try
     (let* ((clause (car clauses))
-           (head (car clause))
-           (body (cdr clause))
-           (unified (meta-log-prolog-unify goal head '())))
-      (if unified
-          (let ((new-goal (mapcar (lambda (g)
-                                    (meta-log-prolog-subst unified g))
-                                  body)))
-            (if (null new-goal)
-                (append
-                 (meta-log-prolog-resolve goal (cdr clauses) unified
-                                          (cons clause proof))
-                 (meta-log-prolog-resolve goal (cdr clauses) bindings proof))
-              (append
-               (meta-log-prolog-resolve (car new-goal) meta-log-prolog--db
-                                        unified (cons clause proof))
-               (meta-log-prolog-resolve goal (cdr clauses) bindings proof))))
+           ;; Handle both facts (just a list) and rules (head . body)
+           (head (if (and (listp clause) (symbolp (car clause)))
+                    clause  ; It's a fact
+                  (car clause)))  ; It's a rule, get the head
+           (body (if (and (listp clause) (symbolp (car clause)))
+                    '()  ; Facts have no body
+                  (cdr clause)))  ; Rules have body
+           (unified (meta-log-prolog-unify goal head bindings)))
+      (if (not (eq unified :failed))
+          (if (null body)
+              ;; Fact matched - return this solution and continue searching
+              (cons unified (meta-log-prolog-resolve goal (cdr clauses) bindings proof))
+            ;; Rule matched - resolve body goals
+            (append
+             (meta-log-prolog-resolve-body body meta-log-prolog--db unified proof)
+             (meta-log-prolog-resolve goal (cdr clauses) bindings proof)))
+        ;; No match - try next clause
         (meta-log-prolog-resolve goal (cdr clauses) bindings proof)))))
+
+(defun meta-log-prolog-resolve-body (goals db bindings proof)
+  "Resolve a list of GOALS against DB with BINDINGS.
+Returns list of binding sets that satisfy all goals."
+  (if (null goals)
+      (list bindings)  ; All goals satisfied
+    (let ((results '()))
+      (dolist (solution (meta-log-prolog-resolve (car goals) db bindings proof))
+        (setq results (append results
+                             (meta-log-prolog-resolve-body (cdr goals) db solution proof))))
+      results)))
 
 (defun meta-log-prolog-query-interactive (query-string)
   "Execute a Prolog query from a string.

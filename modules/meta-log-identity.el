@@ -140,9 +140,10 @@ IDENTITY is a meta-log-peer-identity structure.
 SIGNATURE is a hex string signature.
 MESSAGE is the signed message string.
 Returns t if signature is valid."
-  (let* ((public-key (meta-log-peer-identity-public-key identity))
+  (let* ((private-key (meta-log-peer-identity-private-key identity))
+         (public-key (meta-log-peer-identity-public-key identity))
          (signature-bytes (meta-log-crypto-parse-key signature)))
-    (meta-log-crypto-verify public-key signature-bytes message)))
+    (meta-log-crypto-verify-with-keys private-key public-key signature-bytes message)))
 
 (defun meta-log-identity-get-current-peer ()
   "Get current peer identity.

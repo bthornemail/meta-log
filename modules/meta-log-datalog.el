@@ -76,8 +76,8 @@ Returns hash table of all derived facts."
     (dolist (stratum strata)
       (let ((new-facts (meta-log-datalog-evaluate-stratum stratum current)))
         (dolist (fact new-facts)
-          (let ((pred (car fact))
-                (key (symbol-name pred)))
+          (let* ((pred (car fact))
+                 (key (symbol-name pred)))
             (puthash key
                      (cons fact (gethash key current '()))
                      current)))))
@@ -110,8 +110,8 @@ Returns list of new facts."
             new-facts
           (setq new-facts (append new-facts delta))
           (dolist (fact delta)
-            (let ((pred (car fact))
-                  (key (symbol-name pred)))
+            (let* ((pred (car fact))
+                   (key (symbol-name pred)))
               (puthash key
                        (cons fact (gethash key db '()))
                        db)))
@@ -127,10 +127,22 @@ Returns list of newly derived facts."
         ;; Match body against database
         (let ((matches (meta-log-datalog-match-body body db)))
           (dolist (match matches)
-            (let ((new-fact (meta-log-datalog-subst head match)))
-              (unless (member new-fact (append (gethash (symbol-name stratum) db '())
-                                                new-facts))
-                (push new-fact delta)))))))
+            (condition-case err
+                (let* ((new-fact (meta-log-datalog-subst head match))
+                       ;; Extract predicate from the new fact
+                       (pred (car new-fact))
+                       (pred-key (symbol-name pred)))
+                  (unless (symbolp pred)
+                    (error "Invalid predicate in new fact: %S (fact: %S)" pred new-fact))
+                  ;; Check if fact already exists
+                  (unless (member new-fact (append (gethash pred-key db '())
+                                                    new-facts))
+                    (push new-fact delta)))
+              (error
+               (message "Error computing delta for stratum %s: %s"
+                       stratum (error-message-string err))
+               (message "  Rule: %S" rule)
+               (message "  Match: %S" match)))))))
     delta))
 
 (defun meta-log-datalog-match-body (body db)
@@ -145,16 +157,16 @@ Returns list of binding sets."
             (key (symbol-name pred)))
         (dolist (fact (gethash key db '()))
           (let ((bindings (meta-log-datalog-unify goal fact '())))
-            (when bindings
+            (when (not (eq bindings :failed))
               (dolist (rest-match (meta-log-datalog-match-body rest db))
                 (let ((combined (meta-log-datalog-merge-bindings bindings rest-match)))
-                  (when combined
+                  (when (not (eq combined :failed))
                     (push combined results))))))))
       results)))
 
 (defun meta-log-datalog-unify (x y bindings)
   "Unify two terms with bindings.
-Returns new bindings or nil."
+Returns new bindings or :failed."
   (cond
    ((equal x y) bindings)
    ((meta-log-datalog-variable-p x)
@@ -163,8 +175,10 @@ Returns new bindings or nil."
     (meta-log-datalog-bind y x bindings))
    ((and (listp x) (listp y))
     (let ((b1 (meta-log-datalog-unify (car x) (car y) bindings)))
-      (and b1 (meta-log-datalog-unify (cdr x) (cdr y) b1))))
-   (t nil)))
+      (if (eq b1 :failed)
+          :failed
+        (meta-log-datalog-unify (cdr x) (cdr y) b1))))
+   (t :failed)))
 
 (defun meta-log-datalog-bind (var val bindings)
   "Bind variable to value in bindings."
@@ -176,6 +190,7 @@ Returns new bindings or nil."
 (defun meta-log-datalog-subst (term bindings)
   "Substitute variables in term with bindings."
   (cond
+   ((null term) term)  ; Handle nil/empty list explicitly
    ((meta-log-datalog-variable-p term)
     (let ((binding (assoc term bindings)))
       (if binding
@@ -188,7 +203,7 @@ Returns new bindings or nil."
 
 (defun meta-log-datalog-merge-bindings (b1 b2)
   "Merge two binding sets.
-Returns merged bindings or nil if incompatible."
+Returns merged bindings or :failed if incompatible."
   (let ((merged b1))
     (dolist (binding b2)
       (let ((var (car binding))
@@ -196,22 +211,22 @@ Returns merged bindings or nil if incompatible."
         (let ((existing (assoc var merged)))
           (if existing
               (let ((unified (meta-log-datalog-unify (cdr existing) val merged)))
-                (if unified
+                (if (not (eq unified :failed))
                     (setq merged unified)
-                  (setq merged nil)
-                  (cl-return nil)))
+                  (setq merged :failed)
+                  (cl-return :failed)))
             (push binding merged)))))
     merged))
 
 (defun meta-log-datalog-immediate-query (db goal)
   "Query database immediately (no rule evaluation).
 Returns matching facts."
-  (let ((pred (car goal))
-        (key (symbol-name pred))
-        (results '()))
+  (let* ((pred (car goal))
+         (key (symbol-name pred))
+         (results '()))
     (dolist (fact (gethash key db '()))
       (let ((bindings (meta-log-datalog-unify goal fact '())))
-        (when bindings
+        (when (not (eq bindings :failed))
           (push (meta-log-datalog-subst goal bindings) results))))
     results))
 

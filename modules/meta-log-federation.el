@@ -91,19 +91,16 @@ Returns peer identity structure or nil."
 (defun meta-log-federation-create-blackboard (file)
   "Create federation blackboard Org file.
 FILE is the path to create."
-  (let ((buffer (find-file-noselect file)))
-    (with-current-buffer buffer
-      (erase-buffer)
-      (insert "* Federation Blackboard\n")
-      (insert ":PROPERTIES:\n")
-      (insert ":FEDERATION_VERSION: 1.0\n")
-      (insert (format ":BLACKBOARD_ID: blackboard-%s\n" (random 1000000)))
-      (insert (format ":LAST_SYNC: %s\n" (format-time-string "%Y-%m-%dT%H:%M:%SZ")))
-      (insert ":END:\n\n")
-      (insert "** Peers\n\n")
-      (insert "** CanvasL State\n\n")
-      (save-buffer))
-    (message "Created federation blackboard: %s" file)))
+  (with-temp-file file
+    (insert "* Federation Blackboard\n")
+    (insert ":PROPERTIES:\n")
+    (insert ":FEDERATION_VERSION: 1.0\n")
+    (insert (format ":BLACKBOARD_ID: blackboard-%s\n" (random 1000000)))
+    (insert (format ":LAST_SYNC: %s\n" (format-time-string "%Y-%m-%dT%H:%M:%SZ")))
+    (insert ":END:\n\n")
+    (insert "** Peers\n\n")
+    (insert "** CanvasL State\n\n"))
+  (message "Created federation blackboard: %s" file))
 
 (defun meta-log-federation-announce-peer (&optional identity)
   "Announce this peer to the network.

@@ -52,31 +52,35 @@
   (message "Testing identity module...")
   (let ((identity (meta-log-identity-create-peer))
         (errors '()))
-    (unless identity
-      (push "Identity should not be nil" errors))
-    (unless (meta-log-peer-identity-p identity)
-      (push "Identity should be a peer-identity struct" errors))
-    
-    (let ((peer-id (meta-log-identity-get-peer-id identity))
-          (public-key (meta-log-identity-get-public-key identity)))
-      (unless peer-id
-        (push "Peer ID should not be nil" errors))
-      (unless public-key
-        (push "Public key should not be nil" errors))
-      (unless (string-prefix-p "peer-" peer-id)
-        (push "Peer ID should start with 'peer-'" errors)))
-    
-    (let ((message "test message")
-          (signature (meta-log-identity-sign-message identity message)))
-      (unless signature
-        (push "Signature should not be nil" errors))
-      (unless (string-prefix-p "0x" signature)
-        (push "Signature should start with '0x'" errors))
-      
-      (let ((valid (meta-log-identity-verify-peer identity signature message)))
-        (unless valid
-          (push "Signature should be valid" errors))))
-    
+    (condition-case err
+        (progn
+          (unless identity
+            (push "Identity should not be nil" errors))
+          (unless (meta-log-peer-identity-p identity)
+            (push "Identity should be a peer-identity struct" errors))
+
+          (let ((peer-id (meta-log-identity-get-peer-id identity))
+                (public-key (meta-log-identity-get-public-key identity)))
+            (unless peer-id
+              (push "Peer ID should not be nil" errors))
+            (unless public-key
+              (push "Public key should not be nil" errors))
+            (unless (string-prefix-p "peer-" peer-id)
+              (push "Peer ID should start with 'peer-'" errors)))
+
+          ;; Test signature creation and verification
+          (let ((test-msg "test message"))
+            (let ((signature (meta-log-identity-sign-message identity test-msg)))
+              (unless signature
+                (push "Signature should not be nil" errors))
+              (unless (string-prefix-p "0x" signature)
+                (push "Signature should start with '0x'" errors))
+
+              (let ((valid (meta-log-identity-verify-peer identity signature test-msg)))
+                (unless valid
+                  (push "Signature should be valid" errors))))))
+      (error (push (format "Identity error: %s" (error-message-string err)) errors)))
+
     (if errors
         (progn
           (message "✗ Identity tests failed: %s" (mapconcat 'identity errors ", "))
@@ -110,7 +114,7 @@
 (defun test-federation-blackboard ()
   "Test federation blackboard."
   (message "Testing federation blackboard...")
-  (let ((test-file "/tmp/test-federation-blackboard.org")
+  (let ((test-file (expand-file-name "test-federation-blackboard.org" temporary-file-directory))
         (errors '()))
     (meta-log-federation-create-blackboard test-file)
     (unless (file-exists-p test-file)

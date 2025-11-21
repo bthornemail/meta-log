@@ -1,10 +1,30 @@
 # meta-log
 
-User-friendly abstraction layer for automaton systems with Prolog, Datalog, and R5RS integration.
+AI-powered personal knowledge system with natural language queries, automatic knowledge graph building, and chat interface.
+
+---
+
+## 🚀 **[Quick Start Guide](QUICKSTART.md)** ← **Start Here!**
+
+Get up and running in **under 5 minutes**:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/bthornemail/meta-log/main/install.sh | bash
+```
+
+Then launch and chat with your notes!
+
+---
 
 ## Overview
 
-meta-log provides a complete Emacs Lisp package that abstracts Prolog/Datalog/R5RS complexity behind natural language interfaces and M-expressions. It integrates with Org Mode as a blackboard, supports Docker deployment, and can be distributed via MELPA.
+meta-log is an intelligent knowledge management system that combines:
+- 🤖 **AI-powered chat interface** - Ask questions in natural language
+- 📚 **Automatic note indexing** - Import and search all your files
+- 🔗 **Knowledge graph** - Discover connections between ideas
+- 🧠 **Logic programming** - Prolog/Datalog/R5RS engines built-in
+- 🔒 **Privacy-first** - Run AI locally (Ollama) or use cloud APIs
+- 📱 **Works everywhere** - Desktop, mobile (Termux), or Docker
 
 ## Features
 

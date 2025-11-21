@@ -53,6 +53,9 @@
 
 ;;; Code:
 
+;; Add modules directory to load path
+(add-to-list 'load-path (expand-file-name "modules" (file-name-directory load-file-name)))
+
 ;; Core modules - always loaded
 (require 'meta-log-core)
 (require 'meta-log-prolog)
@@ -63,6 +66,12 @@
 (require 'meta-log-natural-language)
 (require 'meta-log-automata)
 (require 'meta-log-babel)
+
+;; User experience modules - loaded for ease of use
+(require 'meta-log-setup nil t)      ; First-time setup wizard
+(require 'meta-log-dashboard nil t)  ; Dashboard UI
+(require 'meta-log-chat nil t)       ; Chat interface
+(require 'meta-log-ingest nil t)     ; Folder ingestion
 
 ;; Optional modules - users can require these as needed
  (require 'meta-log-federation)

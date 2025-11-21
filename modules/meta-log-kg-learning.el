@@ -204,9 +204,9 @@ Returns generated module code."
           (push source implementations))))
 
     ;; Generate module template
-    (let ((module-name (format "meta-log-%s" (downcase topic)))
-          (module-code
-           (format ";;; %s.el --- %s integration for meta-log
+    (let* ((module-name (format "meta-log-%s" (downcase topic)))
+           (module-code
+            (format ";;; %s.el --- %s integration for meta-log
 
 ;; Copyright (C) 2025 Automaton System
 ;; Author: Generated from Knowledge Graph

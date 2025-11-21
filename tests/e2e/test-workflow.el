@@ -43,8 +43,9 @@
             (insert "** Lisp\n")
             (insert "Lisp is a family of programming languages.\n"))
 
-          ;; Initialize system
-          (meta-log-initialize)
+          ;; Initialize system if not already initialized
+          (unless meta-log--initialized-p
+            (meta-log-initialize))
 
           ;; Ingest the file
           (meta-log-kg-ingest-file test-org-file)
@@ -72,14 +73,17 @@
           (unless meta-log--initialized-p
             (meta-log-initialize))
 
+          ;; Reset Prolog database for test isolation
+          (setq meta-log-prolog--db '())
+
           ;; Add test knowledge
           (meta-log-prolog-add-fact 'programming_language 'lisp)
           (meta-log-prolog-add-fact 'programming_language 'python)
           (meta-log-prolog-add-fact 'paradigm 'lisp 'functional)
           (meta-log-prolog-add-fact 'paradigm 'python 'imperative)
 
-          ;; Test Prolog query
-          (let ((result (meta-log-prolog-query '(programming_language ?X))))
+          ;; Test Prolog query (use uppercase X for variable)
+          (let ((result (meta-log-prolog-query '(programming_language X))))
             (unless result
               (push "Prolog query should return results" errors)))
 
@@ -136,9 +140,12 @@
           (unless meta-log--initialized-p
             (meta-log-initialize))
 
+          ;; Reset Prolog database for test isolation
+          (setq meta-log-prolog--db '())
+
           ;; Test Prolog to Datalog integration
           (meta-log-prolog-add-fact 'test 'integration 'works)
-          (let ((result (meta-log-prolog-query '(test integration ?X))))
+          (let ((result (meta-log-prolog-query '(test integration X))))
             (unless result
               (push "Prolog integration query failed" errors)))
 

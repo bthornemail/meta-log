@@ -44,11 +44,11 @@ PARAMS: alist of parameters"
 (define (qstar-evaluate state action)
   "Evaluate Q*(state, action).
 Returns (value plan provenance)."
-  (let ((immediate-cost (qstar-immediate-cost state action))
-        (next-state (qstar-apply-action state action))
-        (future-value (if (qstar-goal-p next-state)
-                          0.0
-                          (qstar-future-value next-state))))
+  (let* ((immediate-cost (qstar-immediate-cost state action))
+         (next-state (qstar-apply-action state action))
+         (future-value (if (qstar-goal-p next-state)
+                           0.0
+                           (qstar-future-value next-state))))
     (let ((q-value (- (+ immediate-cost (* *qstar-gamma* future-value)))))
       (list q-value
             (list action)
@@ -122,15 +122,15 @@ Returns alist of (component . cost)."
 STATE: current state
 ACTION-SPACE: list of available actions
 Returns (best-action value candidates)."
-  (let ((evaluations (map (lambda (action)
-                            (let ((result (qstar-evaluate state action)))
-                              (list action (list-ref result 0) result)))
-                          action-space)))
-    (let ((sorted (sort-evaluations evaluations))
-          (best (car sorted)))
-      (list (list-ref best 0)  ; best action
-            (list-ref best 1)   ; value
-            sorted))))           ; all candidates
+  (let* ((evaluations (map (lambda (action)
+                              (let ((result (qstar-evaluate state action)))
+                                (list action (list-ref result 0) result)))
+                            action-space))
+         (sorted (sort-evaluations evaluations))
+         (best (car sorted)))
+    (list (list-ref best 0)  ; best action
+          (list-ref best 1)   ; value
+          sorted)))           ; all candidates
 
 (define (sort-evaluations evaluations)
   "Sort evaluations by Q-value (ascending = lower cost = better)."
@@ -148,9 +148,9 @@ Returns (best-action value candidates)."
              (best (car evaluations)))
     (if (null? remaining)
         best
-        (let ((current (car remaining))
-              (best-value (list-ref best 1))
-              (current-value (list-ref current 1)))
+        (let* ((current (car remaining))
+               (best-value (list-ref best 1))
+               (current-value (list-ref current 1)))
           (if (< current-value best-value)
               (loop (cdr remaining) current)
               (loop (cdr remaining) best))))))

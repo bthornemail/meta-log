@@ -46,16 +46,16 @@ Returns (path cost nodes-expanded)."
                (expanded nodes-expanded))
       (if (or (null? open) (> expanded max-nodes))
           (list '() 0.0 expanded)  ; failure
-          (let ((current (find-min-f-cost open))
-                (current-state (list-ref current 1)))
+          (let* ((current (find-min-f-cost open))
+                 (current-state (list-ref current 1)))
             (if (goal-pred current-state)
                 (let ((path (reconstruct-path current)))
                   (list path (list-ref current 2) expanded))
-                (let ((new-open (remove current open))
-                      (new-closed (cons current closed))
-                      (successors (get-successors current-state)))
-                  (let ((updated-open (add-successors new-open new-closed successors current heuristic goal-pred)))
-                    (loop updated-open new-closed (+ expanded 1))))))))))
+                (let* ((new-open (remove current open))
+                       (new-closed (cons current closed))
+                       (successors (get-successors current-state))
+                       (updated-open (add-successors new-open new-closed successors current heuristic goal-pred)))
+                  (loop updated-open new-closed (+ expanded 1)))))))))
 
 (define (find-min-f-cost nodes)
   "Find node with minimum f-cost."

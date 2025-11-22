@@ -27,6 +27,8 @@
 
 ;; Load consciousness modules
 (load "consciousness/state.scm")
+(load "consciousness/qualia.scm")
+(load "consciousness/metrics.scm")
 
 ;; Load physics modules
 (load "physics/quantum.scm")

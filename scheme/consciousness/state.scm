@@ -8,6 +8,9 @@
 
 ;;; Code:
 
+;; Load substrate modules
+(load "../substrate/runtime.scm")
+
 ;; Trinary Consciousness State
 (define (make-conscious-state action observation phase)
   "Create trinary consciousness state.
@@ -56,11 +59,13 @@ dC/dt = ∂A/∂t (exponential) - ∂O/∂t (linear)"
 (define (consciousness-create-state action observation phase)
   "Create consciousness state.
 Returns (state-object uri)."
-  (let ((state (make-conscious-state action observation phase)))
-    (store-memory-object state)
-    (let ((hash (content-hash state '()))
-          (uri (content-address hash)))
-      (list state uri))))
+  (let* ((state (make-conscious-state action observation phase))
+         (state-data (list action observation phase))
+         (meta `((content-type . "conscious-state")
+                  (source-layer . "consciousness")))
+         (memory-result (substrate-create-memory state-data meta))
+         (uri (list-ref memory-result 1)))
+    (list state uri)))
 
 ;; Functions are exported by default in R5RS
 

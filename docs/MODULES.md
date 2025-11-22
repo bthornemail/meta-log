@@ -416,6 +416,60 @@ These modules are loaded automatically when you `(require 'meta-log)`:
 
 ---
 
+#### meta-log-e8
+**Purpose**: E8 exceptional Lie algebra lattice operations
+
+**Features**:
+- 240 E8 roots construction
+- BIP32 path → E8 point mapping
+- Weyl group operations (with dynamic performance-based limits)
+- p-adic heights for ramification detection
+- Shortest path algorithms (A* on E8 graph)
+- FRBAC delegation verification
+- Distance features for ML
+
+**Dependencies**:
+- meta-log-p-adic (for p-adic operations)
+
+**Usage**:
+```elisp
+(require 'meta-log-e8)
+(let ((point (meta-log-e8-bip32-to-e8 "m/44'/0'/0'/0/0")))
+  (message "E8 point: %s" (meta-log-e8-point-coords point)))
+```
+
+**External Dependencies**: None
+
+**Documentation**: See [E8 Lattice](E8_LATTICE.md) for complete details.
+
+---
+
+#### meta-log-e8-theta
+**Purpose**: E8 theta series and quaternary quadratic form analysis
+
+**Features**:
+- E8 theta series computation (weight-4 modular form)
+- Theta coefficient lookup (r_E8(n))
+- QQF linkage analysis
+- Quorum stability prediction
+- Ramanujan form detection
+
+**Dependencies**:
+- meta-log-quadratic-forms (for QQF operations)
+
+**Usage**:
+```elisp
+(require 'meta-log-e8-theta)
+(let ((theta (meta-log-e8-theta-series-create 10)))
+  (message "r_E8(1) = %d" (meta-log-e8-theta-coefficient theta 1)))
+```
+
+**External Dependencies**: None
+
+**Documentation**: See [E8 Theta Series](E8_THETA_SERIES.md) for complete details.
+
+---
+
 ### Integration Modules
 
 #### meta-log-canvas-api
@@ -553,6 +607,10 @@ Core:
   meta-log
     ├── meta-log-core
     ├── meta-log-prolog
+    ├── meta-log-e8 (optional)
+    │   └── meta-log-p-adic
+    └── meta-log-e8-theta (optional)
+        └── meta-log-quadratic-forms
     ├── meta-log-datalog
     ├── meta-log-r5rs
     ├── meta-log-m-expression
@@ -606,6 +664,8 @@ Optional:
 | meta-log-automata | npm, automaton-evolutions | Optional |
 | meta-log-mqtt | Mosquitto MQTT broker | Yes (for MQTT) |
 | meta-log-webrtc | STUN/TURN server | Optional (for NAT) |
+| meta-log-e8 | None | N/A |
+| meta-log-e8-theta | None | N/A |
 | All others | None | N/A |
 
 ---
@@ -641,3 +701,7 @@ If you get "Cannot open load file: No such file or directory, meta-log-MODULE":
 - [Federation Guide](FEDERATION_GUIDE.md) - Federation setup
 - [Crypto Guide](CRYPTO_GUIDE.md) - Cryptography usage
 - [Template Discovery Bridge](TEMPLATE-DISCOVERY-BRIDGE.md) - Template system documentation
+- [E8 Lattice](E8_LATTICE.md) - E8 exceptional Lie algebra operations
+- [E8 Theta Series](E8_THETA_SERIES.md) - E8 theta series and QQF analysis
+- [E8 Benchmarks](E8_BENCHMARKS.md) - Performance benchmarks
+- [E8 Demo Log](E8_DEMO_LOG.md) - Proof of concept demonstration

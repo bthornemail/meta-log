@@ -139,7 +139,7 @@ Returns list of 240 root vectors (each is list of 8 floats)."
       (let ((signs (cl-loop for bit from 0 below 8
                             collect (= (logand mask (ash 1 bit)) 0))))
         (let ((num-minus (cl-count nil signs)))
-          (when (evenp num-minus)  ; Even number of -1s
+          (when (= (mod num-minus 2) 0)  ; Even number of -1s
             (let ((root (cl-loop for s in signs
                                  collect (if s 0.5 -0.5))))
               (push root roots))))))
@@ -213,8 +213,8 @@ Returns list of 8 floats."
 COORDS is list of 8 floats.
 Returns list of 8 floats (E8 lattice point)."
   (let ((rounded (mapcar #'round coords)))
-    ;; E8 condition: sum must be even
-    (if (evenp (cl-reduce #'+ rounded))
+        ;; E8 condition: sum must be even
+        (if (= (mod (cl-reduce #'+ rounded) 2) 0)
         (mapcar #'float rounded)
       ;; Shift to (ℤ + ½)⁸ coset
       (mapcar (lambda (c) (float (+ (round (- c 0.5)) 0.5))) coords))))

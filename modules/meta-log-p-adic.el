@@ -56,20 +56,22 @@ Returns p-adic norm (float)."
 
 (cl-defstruct meta-log-p-adic-upper-half-plane
   "p-Adic upper half-plane Ω_p = ℂ_p \ ℚ_p structure."
-  p)
+  prime)
 
 (defun meta-log-p-adic-upper-half-plane-create (p)
   "Create p-adic upper half-plane for prime P.
 Returns meta-log-p-adic-upper-half-plane structure."
-  (make-meta-log-p-adic-upper-half-plane :p p))
+  (make-meta-log-p-adic-upper-half-plane :prime p))
 
 (defun meta-log-p-adic-point-in-hp (z p)
   "Check if point Z is in p-adic upper half-plane.
 Z is a complex number or p-adic number representation.
 P is a prime.
 Returns t if z ∈ Ω_p, nil otherwise."
-  (let ((norm (meta-log-p-adic-norm z p)))
-    (and (> norm 0) (< norm 1))))
+  (condition-case nil
+      (let ((norm (meta-log-p-adic-norm z p)))
+        (and (> norm 0) (< norm 1)))
+    (error nil)))  ; Return nil on error (simplified check)
 
 ;;; p-Adic Modular Forms (simplified)
 

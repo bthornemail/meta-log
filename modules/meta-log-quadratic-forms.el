@@ -66,8 +66,16 @@ BQF-OBJ is a parsed JSON object with 'coefficients and 'form fields.
 Returns meta-log-bqf structure or nil."
   (when bqf-obj
     (let ((coeffs (cdr (assq 'coefficients bqf-obj))))
-      (when (and (listp coeffs) (>= (length coeffs) 3))
-        (meta-log-bqf-from-coefficients coeffs)))))
+      (cond
+       ((vectorp coeffs)
+        ;; Convert vector to list
+        (let ((coeff-list (cl-loop for i from 0 below (length coeffs)
+                                   collect (aref coeffs i))))
+          (when (>= (length coeff-list) 3)
+            (meta-log-bqf-from-coefficients coeff-list))))
+       ((listp coeffs)
+        (when (>= (length coeffs) 3)
+          (meta-log-bqf-from-coefficients coeffs)))))))
 
 ;;; Ternary Quadratic Forms (TQF)
 
@@ -152,26 +160,27 @@ Returns determinant value."
         (a31 (aref (aref m 3) 1))
         (a32 (aref (aref m 3) 2))
         (a33 (aref (aref m 3) 3)))
-    ;; Laplace expansion
-    (- (+ (* a00 (meta-log-matrix-determinant-3x3
-                  (vector (vector a11 a12 a13)
-                          (vector a21 a22 a23)
-                          (vector a31 a32 a33))))
-          (* a01 (meta-log-matrix-determinant-3x3
+    ;; Laplace expansion: det = Σ (-1)^(i+j) * a_ij * M_ij
+    (+ (* a00 (meta-log-matrix-determinant-3x3
+               (vector (vector a11 a12 a13)
+                       (vector a21 a22 a23)
+                       (vector a31 a32 a33))))
+       (- (* a01 (meta-log-matrix-determinant-3x3
                   (vector (vector a10 a12 a13)
                           (vector a20 a22 a23)
                           (vector a30 a32 a33)))))
-       (+ (* a02 (meta-log-matrix-determinant-3x3
-                  (vector (vector a10 a11 a13)
-                          (vector a20 a21 a23)
-                          (vector a30 a31 a33))))
-          (* a03 (meta-log-matrix-determinant-3x3
+       (* a02 (meta-log-matrix-determinant-3x3
+               (vector (vector a10 a11 a13)
+                       (vector a20 a21 a23)
+                       (vector a30 a31 a33))))
+       (- (* a03 (meta-log-matrix-determinant-3x3
                   (vector (vector a10 a11 a12)
                           (vector a20 a21 a22)
                           (vector a30 a31 a32))))))))
 
 (defun meta-log-matrix-determinant-3x3 (m)
-  "Compute determinant of 3x3 matrix M."
+  "Compute determinant of 3x3 matrix M.
+Formula: a(ei - fh) - b(di - fg) + c(dh - eg)"
   (let ((a (aref (aref m 0) 0))
         (b (aref (aref m 0) 1))
         (c (aref (aref m 0) 2))
@@ -182,8 +191,8 @@ Returns determinant value."
         (h (aref (aref m 2) 1))
         (i (aref (aref m 2) 2)))
     (- (+ (* a (- (* e i) (* f h)))
-          (* b (- (* f g) (* d i)))
-          (* c (- (* d h) (* e g)))))))
+          (* b (- (* d i) (* f g))))
+       (* c (- (* d h) (* e g))))))
 
 (defun meta-log-qqf-classify (qqf)
   "Classify QQF by discriminant.

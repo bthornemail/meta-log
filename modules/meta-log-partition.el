@@ -89,7 +89,7 @@ Returns list of component vertex lists."
     ;; Extract components
     (dolist (v vertices)
       (unless (gethash v visited)
-        (push (meta-log-partition--dfs-collect v adj visited) components))))
+        (push (meta-log-partition--dfs-collect v adj visited) components)))
     components))
 
 (defun meta-log-partition--dfs-collect (vertex adj visited)

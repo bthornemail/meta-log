@@ -155,7 +155,7 @@ Returns list of consensus criteria (boolean values) with discriminant classifica
                   (setq criteria (append criteria
                                         `((:discriminant . ,(meta-log-bqf-discriminant bqf-struct))
                                           (:classification . ,classification)
-                                          (:stable . ,(member classification '(positive-definite negative-definite))))))))))))
+                                          (:stable . ,(member classification '(positive-definite negative-definite)))))))))))))
     (if classification
         (append criteria `((:bqf-classification . ,classification)))
       criteria)))

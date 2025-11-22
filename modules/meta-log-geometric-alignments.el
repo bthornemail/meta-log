@@ -17,6 +17,7 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'meta-log-p-adic)
 
 ;;; Deltoid (3-Cusped Hypocycloid)
 
@@ -112,7 +113,7 @@ Returns (x, y) coordinates in Cartesian."
   "Get number of petals for rosette.
 K is the parameter.
 Returns petal count (2k if k even, k if k odd)."
-  (if (evenp k) (* 2 k) k))
+  (if (= (mod k 2) 0) (* 2 k) k))
 
 ;;; Integration with Geometric Consensus
 
@@ -203,23 +204,23 @@ Returns rendering data structure for Babylon.js."
   (pcase curve-type
     (:deltoid
      `((:type . deltoid)
-       (:points . ,(cl-loop for t from 0 to (* 2 pi) by 0.1
-                           collect (meta-log-deltoid-parametrization t))))
-     (:astroid
-      `((:type . astroid)
-        (:points . ,(cl-loop for t from 0 to (* 2 pi) by 0.1
-                             collect (meta-log-astroid-parametrization t)))))
-     (:epicycloid
-      (let ((R (plist-get params :R))
-            (r (plist-get params :r)))
-        `((:type . epicycloid)
-          (:points . ,(cl-loop for t from 0 to (* 2 pi) by 0.1
-                               collect (meta-log-epicycloid-parametrization t R r))))))
-     (:rosette
-      (let ((k (plist-get params :k)))
-        `((:type . rosette)
-          (:points . ,(cl-loop for t from 0 to (* 2 pi) by 0.1
-                               collect (meta-log-rosette-parametrization t k))))))))
+       (:points . ,(cl-loop for t-param from 0.0 to (* 2.0 pi) by 0.1
+                           collect (meta-log-deltoid-parametrization t-param)))))
+    (:astroid
+     `((:type . astroid)
+       (:points . ,(cl-loop for t-param from 0.0 to (* 2.0 pi) by 0.1
+                            collect (meta-log-astroid-parametrization t-param)))))
+    (:epicycloid
+     (let ((R (plist-get params :R))
+           (r (plist-get params :r)))
+       `((:type . epicycloid)
+         (:points . ,(cl-loop for t-param from 0.0 to (* 2.0 pi) by 0.1
+                              collect (meta-log-epicycloid-parametrization t-param R r))))))
+    (:rosette
+     (let ((k (plist-get params :k)))
+       `((:type . rosette)
+         (:points . ,(cl-loop for t-param from 0.0 to (* 2.0 pi) by 0.1
+                              collect (meta-log-rosette-parametrization t-param k))))))))
 
 (provide 'meta-log-geometric-alignments)
 

@@ -17,6 +17,8 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'meta-log-p-adic)
+(require 'meta-log-p-adic)
 
 ;;; Quaternion Algebra Structure
 
@@ -27,7 +29,7 @@ Basis: {1, i, j, k} with i²=a, j²=b, k=ij=-ji, k²=-ab"
 
 (cl-defstruct meta-log-quaternion-element
   "Element of quaternion algebra: t + xi + yj + zk"
-  t x y z algebra)
+  t-coeff x y z algebra)
 
 (defun meta-log-quaternion-algebra-create (a b &optional field)
   "Create quaternion algebra (a,b/F).
@@ -43,7 +45,7 @@ T-VAL, X, Y, Z are coefficients.
 ALGEBRA is the quaternion algebra structure.
 Returns meta-log-quaternion-element structure."
   (make-meta-log-quaternion-element
-   :t t-val :x x :y y :z z :algebra algebra))
+   :t-coeff t-val :x x :y y :z z :algebra algebra))
 
 ;;; Norm Form
 
@@ -52,7 +54,7 @@ Returns meta-log-quaternion-element structure."
 Q is a meta-log-quaternion-element.
 Norm form: t² - a x² - b y² + a b z²
 Returns norm value."
-  (let ((t-val (meta-log-quaternion-element-t q))
+  (let ((t-val (meta-log-quaternion-element-t-coeff q))
         (x (meta-log-quaternion-element-x q))
         (y (meta-log-quaternion-element-y q))
         (z (meta-log-quaternion-element-z q))
@@ -97,17 +99,17 @@ Returns 1 if ax² + by² = z² has solution in ℚ_p, -1 otherwise."
           (vb (meta-log-p-adic-valuation b p)))
       (if (and (zerop va) (zerop vb))
           ;; Both units: use Legendre symbol
-          (* (meta-log-legendre-symbol a p vb)
-             (meta-log-legendre-symbol b p va)
+          (* (meta-log-legendre-symbol a p)
+             (meta-log-legendre-symbol b p)
              (expt -1 (* va vb)))
         (meta-log-hilbert-symbol-reduce a b p va vb))))))
 
 (defun meta-log-hilbert-symbol-2 (a b)
   "Hilbert symbol for p=2 (simplified)."
   ;; Simplified: return 1 for most cases, -1 for special conditions
-  (if (and (oddp a) (oddp b))
-      (if (or (and (= (mod a 8) 1) (= (mod b 8) 1))
-              (and (= (mod a 8) 3) (= (mod b 8) 3)))
+  (if (and (= (mod (abs a) 2) 1) (= (mod (abs b) 2) 1))
+      (if (or (and (= (mod (abs a) 8) 1) (= (mod (abs b) 8) 1))
+              (and (= (mod (abs a) 8) 3) (= (mod (abs b) 8) 3)))
           1 -1)
     1))
 
@@ -115,8 +117,8 @@ Returns 1 if ax² + by² = z² has solution in ℚ_p, -1 otherwise."
   "Reduce Hilbert symbol computation when valuations are non-zero."
   (let ((a-unit (/ a (expt p va)))
         (b-unit (/ b (expt p vb))))
-    (* (meta-log-legendre-symbol a-unit p vb)
-       (meta-log-legendre-symbol b-unit p va)
+    (* (meta-log-legendre-symbol a-unit p)
+       (meta-log-legendre-symbol b-unit p)
        (expt -1 (* va vb)))))
 
 (defun meta-log-legendre-symbol (a p)
@@ -149,20 +151,7 @@ Returns list of ramified primes."
         (push p ramified)))
     ramified))
 
-;;; p-Adic Valuation (helper, will be in p-adic module)
-
-(defun meta-log-p-adic-valuation (n p)
-  "Calculate p-adic valuation v_p(n).
-N is an integer, P is a prime.
-Returns highest power of p dividing n."
-  (if (zerop n)
-      most-positive-fixnum
-    (let ((count 0)
-          (num (abs n)))
-      (while (zerop (mod num p))
-        (setq num (/ num p))
-        (setq count (1+ count)))
-      count)))
+;;; p-Adic Valuation (from meta-log-p-adic module)
 
 ;;; Integration with BIP32
 

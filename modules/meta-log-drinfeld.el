@@ -67,12 +67,16 @@ Returns exponential value (series approximation)."
   (let ((phi-t (meta-log-drinfeld-module-phi-t drinfeld-module))
         (q (meta-log-drinfeld-module-q drinfeld-module))
         (rank (meta-log-drinfeld-module-rank drinfeld-module))
-        (result z)
-        (coeffs (cdr (assq 'coefficients phi-t))))
-    ;; Compute series: z + Σ a_i z^(q^i) up to rank terms
-    (cl-loop for i from 0 below (min rank (length coeffs))
-             for coeff = (nth i coeffs)
-             do (setq result (+ result (* coeff (expt z (expt q (1+ i)))))))
+        (result z))
+    ;; Extract coefficients from phi-t structure
+    (let ((coeffs (if (listp phi-t)
+                      (cdr (assq 'coefficients phi-t))
+                    '(1 0))))  ; Default coefficients if not structured
+      ;; Compute series: z + Σ a_i z^(q^i) up to rank terms
+      (cl-loop for i from 0 below (min rank (length coeffs))
+               for coeff = (nth i coeffs)
+               when coeff
+               do (setq result (+ result (* coeff (expt z (expt q (1+ i))))))))
     result))
 
 ;;; Winding Number
@@ -95,11 +99,12 @@ Returns parametric curve as p-adic orbit in swarm paths."
          (R (car orbit-params))
          (r (cadr orbit-params))
          (ratio (/ (+ R r) r)))
-    (lambda (t)
-      (let* ((z (complex (cos t) (sin t)))
-             (exp-z (funcall exp-phi z))
-             (winding (meta-log-drinfeld-winding-number drinfeld-module)))
-        (meta-log-epicycloid-point exp-z winding R r ratio)))))
+    ;; Return function using epicycloid parametrization
+    ;; Store R and r in the function's closure via list
+    (let ((params (list R r)))
+      (lambda (t-param)
+        ;; Use epicycloid parametrization directly
+        (meta-log-epicycloid-parametrization t-param (car params) (cadr params))))))
 
 (defun meta-log-epicycloid-point (exp-z winding R r ratio)
   "Compute epicycloid point from exponential and winding.

@@ -231,6 +231,20 @@ Returns classification result with stability prediction."
         (:indefinite . ,(eq classification 'indefinite))
         (:degenerate . ,(eq classification 'degenerate))))))
 
+(defun meta-log-qqf-e8-theta-link (qqf &optional theta-series)
+  "Link QQF to E8 theta series for enhanced analysis.
+QQF is a meta-log-qqf structure.
+THETA-SERIES is optional E8 theta series (default: create with max-norm=10).
+Returns plist with E8 theta analysis: :determinant, :predicted-universality,
+:theta-growth-rate, :ramanujan-type."
+  (require 'meta-log-e8-theta)
+  (let* ((theta (or theta-series (meta-log-e8-theta-series-create 10)))
+         (matrix (meta-log-qqf-matrix qqf))
+         (matrix-list (cl-loop for i from 0 below 4
+                              collect (cl-loop for j from 0 below 4
+                                             collect (float (aref (aref matrix i) j))))))
+    (meta-log-e8-theta-link-to-qqf theta matrix-list)))
+
 (provide 'meta-log-quadratic-forms)
 
 ;;; meta-log-quadratic-forms.el ends here

@@ -131,5 +131,54 @@ Returns unified consensus certificate alist."
       (:valid . ,(>= total-agrees (floor (* total-vertices 0.5))))
       (:recovery-method . geometric-duality))))
 
+(defun meta-log-partition-padic-height-e8 (vertex-point p)
+  "Compute p-adic height on E8 lattice for partition detection.
+VERTEX-POINT is a meta-log-e8-point structure representing a vertex.
+P is a prime number.
+High p-adic height indicates ramification at p, which suggests partition risk.
+Returns float height value."
+  (require 'meta-log-e8)
+  (meta-log-e8-padic-height vertex-point p))
+
+(defun meta-log-partition-detect-e8-ramification (vertices edges &optional primes)
+  "Detect network partition via E8 p-adic ramification.
+VERTICES is a list of vertex identifiers (BIP32 paths or E8 points).
+EDGES is a list of (from . to) pairs.
+PRIMES is list of primes to check (default: (2 3 5)).
+Returns plist with :is-ramified, :ramified-primes, :partition-risk."
+  (require 'meta-log-e8)
+  (let ((primes (or primes '(2 3 5)))
+        (ramified-primes '())
+        (max-height 0.0))
+    (dolist (v vertices)
+      (let ((point (if (stringp v)
+                       (meta-log-e8-bip32-to-e8 v)
+                     v)))
+        (dolist (p primes)
+          (let ((height (meta-log-e8-padic-height point p)))
+            (when (> height max-height)
+              (setq max-height height))
+            ;; High height suggests ramification
+            (when (> height 10.0)
+              (pushnew p ramified-primes)))))
+      ;; Check edge endpoints for height differences
+      (dolist (edge edges)
+        (let ((from-point (if (stringp (car edge))
+                              (meta-log-e8-bip32-to-e8 (car edge))
+                            (car edge)))
+              (to-point (if (stringp (cdr edge))
+                            (meta-log-e8-bip32-to-e8 (cdr edge))
+                          (cdr edge))))
+          (dolist (p primes)
+            (let ((height-diff (abs (- (meta-log-e8-padic-height from-point p)
+                                      (meta-log-e8-padic-height to-point p)))))
+              ;; Large height difference suggests partition
+              (when (> height-diff 5.0)
+                (pushnew p ramified-primes)))))))
+    (list :is-ramified (> (length ramified-primes) 0)
+          :ramified-primes ramified-primes
+          :max-height max-height
+          :partition-risk (if (> (length ramified-primes) 0) 'high 'low))))
+
 (provide 'meta-log-partition)
 

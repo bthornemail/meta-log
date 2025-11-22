@@ -392,6 +392,13 @@ Returns quaternion element representing the path."
   (let ((alg (or algebra (meta-log-quaternion-algebra-create -1 -1))))
     (meta-log-quaternion-bip32-path alg path)))
 
+(defun meta-log-crypto-bip32-to-e8 (path)
+  "Map BIP32 path to E8 lattice point.
+PATH is BIP32 path string like \"m/44'/0'/0'/0/0\".
+Returns meta-log-e8-point structure."
+  (require 'meta-log-e8)
+  (meta-log-e8-bip32-to-e8 path))
+
 (defun meta-log-crypto-derive-key (seed path)
   "Derive a BIP32/44 key from seed.
 SEED is a 64-byte seed (list of bytes).

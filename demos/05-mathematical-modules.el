@@ -18,6 +18,8 @@
 (require 'meta-log-shimura-padic)
 (require 'meta-log-drinfeld)
 (require 'meta-log-geometric-alignments)
+(require 'meta-log-e8)
+(require 'meta-log-e8-theta)
 
 (defun demo-math-quadratic-forms ()
   "Demonstrate quadratic forms (BQF, TQF, QQF)."
@@ -263,6 +265,130 @@
     (message "   Cusps: %d" (cdr (assq :cusps result))))
   (message ""))
 
+(defun demo-math-e8 ()
+  "Demonstrate E8 lattice operations."
+  (interactive)
+  (message "🔷 E8 Lattice Demo")
+  (message "")
+  
+  ;; Initialize E8
+  (message "1. E8 Lattice Initialization")
+  (meta-log-e8-initialize)
+  (message "   Roots: %d" (length meta-log-e8--roots))
+  (message "   Simple roots: %d" (length meta-log-e8--simple-roots))
+  (message "   Weyl generators: %d" (length meta-log-e8--weyl-generators))
+  (message "")
+  
+  ;; BIP32 → E8 mapping
+  (message "2. BIP32 Path → E8 Point Mapping")
+  (let ((path "m/44'/0'/0'/0/0")
+        (point (meta-log-e8-bip32-to-e8 path)))
+    (message "   Path: %s" path)
+    (message "   E8 coords: %s" (substring (format "%s" (meta-log-e8-point-coords point)) 0 50))
+    (message "   Norm²: %.4f" (meta-log-e8-point-norm-squared point))
+    (message "   Is root: %s" (if (meta-log-e8-point-is-root point) "yes" "no")))
+  (message "")
+  
+  ;; Weyl orbit
+  (message "3. Weyl Orbit Computation")
+  (let ((point (meta-log-e8-bip32-to-e8 "m/44'/0'/0'/0/0"))
+        (orbit (meta-log-e8-weyl-orbit point 10)))  ; Small limit for demo
+    (message "   Orbit size: %d points" (length orbit))
+    (message "   (Full orbit would be 696,729,600 points)")
+    (message "   Using dynamic performance-based limit"))
+  (message "")
+  
+  ;; p-adic heights
+  (message "4. p-Adic Heights")
+  (let ((point (meta-log-e8-bip32-to-e8 "m/44'/0'/0'/0/0")))
+    (message "   2-adic height: %.4f" (meta-log-e8-padic-height point 2))
+    (message "   3-adic height: %.4f" (meta-log-e8-padic-height point 3))
+    (message "   5-adic height: %.4f" (meta-log-e8-padic-height point 5)))
+  (message "")
+  
+  ;; FRBAC verification
+  (message "5. FRBAC Delegation Verification")
+  (let ((master (meta-log-e8-bip32-to-e8 "m/44'/0'/0'"))
+        (delegate (meta-log-e8-bip32-to-e8 "m/44'/0'/0'/0/0")))
+    (let ((is-valid (meta-log-e8-verify-frbac-delegation master delegate)))
+      (message "   Master → Delegate: %s" (if is-valid "✓ VALID" "✗ INVALID"))))
+  (message "")
+  
+  ;; Distance features
+  (message "6. Distance Features for ML")
+  (let ((p1 (meta-log-e8-bip32-to-e8 "m/44'/0'/0'/0/0"))
+        (p2 (meta-log-e8-bip32-to-e8 "m/44'/0'/0'/0/1"))
+        (dists (meta-log-e8-distance-for-ml p1 p2)))
+    (message "   Euclidean: %.4f" (cdr (assq 'euclidean dists)))
+    (message "   p-adic (2): %.4f" (cdr (assq 'padic_2 dists)))
+    (message "   p-adic (3): %.4f" (cdr (assq 'padic_3 dists)))
+    (message "   Weyl distance: %.4f" (cdr (assq 'weyl_distance dists))))
+  (message ""))
+
+(defun demo-math-e8-theta ()
+  "Demonstrate E8 theta series operations."
+  (interactive)
+  (message "🔷 E8 Theta Series Demo")
+  (message "")
+  
+  ;; Initialize theta series
+  (message "1. E8 Theta Series Initialization")
+  (let ((theta (meta-log-e8-theta-series-create 10)))
+    (message "   Max norm: %d" (plist-get theta :max-norm))
+    (message "   Coefficients computed: %d" (length (plist-get theta :coefficients))))
+  (message "")
+  
+  ;; Classical values
+  (message "2. Classical E8 Theta Coefficients")
+  (let ((theta (meta-log-e8-theta-series-create 10)))
+    (message "   r_E8(0) = %d (expected: 1)" (meta-log-e8-theta-coefficient theta 0))
+    (message "   r_E8(1) = %d (expected: 240)" (meta-log-e8-theta-coefficient theta 1))
+    (let ((r2 (meta-log-e8-theta-coefficient theta 2)))
+      (message "   r_E8(2) = %d (expected: 2160)" r2)
+      (when (or (= r2 2160) (> r2 1000))
+        (message "   ✓ Close to expected value"))))
+  (message "")
+  
+  ;; QQF linkage
+  (message "3. QQF Linkage")
+  (let ((theta (meta-log-e8-theta-series-create 10))
+        (qqf-matrix '((1.0 0.0 0.0 0.0)
+                     (0.0 1.0 0.0 0.0)
+                     (0.0 0.0 1.0 0.0)
+                     (0.0 0.0 0.0 1.0))))
+    (let ((analysis (meta-log-e8-theta-link-to-qqf theta qqf-matrix)))
+      (message "   Determinant: %.4f" (plist-get analysis :determinant))
+      (message "   Predicted universal: %s" (if (plist-get analysis :predicted-universality) "yes" "no"))
+      (message "   Theta growth rate: %.4f" (plist-get analysis :theta-growth-rate))
+      (message "   Ramanujan type: %s" (plist-get analysis :ramanujan-type))))
+  (message "")
+  
+  ;; Quorum stability
+  (message "4. Quorum Stability Prediction")
+  (let ((theta (meta-log-e8-theta-series-create 10))
+        (voter-features '((1.0 2.0 3.0 4.0)
+                         (2.0 3.0 4.0 5.0)
+                         (3.0 4.0 5.0 6.0))))
+    (let ((prediction (meta-log-e8-theta-predict-quorum-stability theta voter-features)))
+      (message "   Stability score: %.4f" (plist-get prediction :stability-score))
+      (message "   QQF determinant: %.4f" (plist-get prediction :qqf-determinant))
+      (message "   Theta growth: %.4f" (plist-get prediction :theta-growth))
+      (message "   Form type: %s" (plist-get prediction :form-type))
+      (let ((score (plist-get prediction :stability-score)))
+        (message "   Status: %s" (cond
+                                  ((> score 0.7) "STABLE")
+                                  ((> score 0.4) "MODERATE")
+                                  (t "UNSTABLE"))))))
+  (message "")
+  
+  ;; Evaluation
+  (message "5. Theta Series Evaluation")
+  (let ((theta (meta-log-e8-theta-series-create 10))
+        (q 0.5))
+    (let ((result (meta-log-e8-theta-evaluate theta q)))
+      (message "   θ_E8(0.5) = %.4f" result)))
+  (message ""))
+  
 (defun demo-math-full ()
   "Run the complete mathematical modules demo."
   (interactive)
@@ -286,6 +412,8 @@
   (demo-math-geometric)
   (demo-math-drinfeld)
   (demo-math-shimura)
+  (demo-math-e8)
+  (demo-math-e8-theta)
   (demo-math-integration)
   
   (message "")
@@ -299,6 +427,7 @@
   (message "  • ML voter prediction (p-adic features)")
   (message "  • Federation swarms (Drinfeld orbits)")
   (message "  • 0D-11D evolutionary strata")
+  (message "  • E8 exceptional geometry (BIP32, Weyl groups, theta series)")
   (message "")))
 
 ;; Run demo

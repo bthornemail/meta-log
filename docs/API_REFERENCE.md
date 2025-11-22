@@ -191,3 +191,72 @@ Find automaton-evolutions installation.
 
 **Returns**: Path to package or nil
 
+## E8 Lattice Functions
+
+### `meta-log-e8-bip32-to-e8` (function)
+
+Map BIP32 path to E8 lattice point.
+
+**Signature**: `(meta-log-e8-bip32-to-e8 path)`
+
+**Arguments**:
+- `path` (string): BIP32 derivation path, e.g., `"m/44'/0'/0'/0/0"`
+
+**Returns**: E8Point structure with coords, bip32-path, depth
+
+**Example**:
+```elisp
+(require 'meta-log-e8)
+(let ((point (meta-log-e8-bip32-to-e8 "m/44'/0'/0'/0/0")))
+  (message "E8 coords: %s" (meta-log-e8-point-coords point)))
+```
+
+### `meta-log-e8-verify-frbac-delegation` (function)
+
+Verify FRBAC delegation using E8 automorphisms.
+
+**Signature**: `(meta-log-e8-verify-frbac-delegation master delegate)`
+
+**Arguments**:
+- `master` (E8Point): Master key point
+- `delegate` (E8Point): Delegate key point
+
+**Returns**: Boolean indicating if delegation is valid
+
+### `meta-log-e8-distance-for-ml` (function)
+
+Compute E8 distance metrics for ML features.
+
+**Signature**: `(meta-log-e8-distance-for-ml point1 point2)`
+
+**Returns**: Plist with :euclidean, :geodesic, :padic-2, :padic-3, :weyl-distance
+
+## E8 Theta Series Functions
+
+### `meta-log-e8-theta-coefficient` (function)
+
+Get r_E8(n): theta series coefficient.
+
+**Signature**: `(meta-log-e8-theta-coefficient theta-series n)`
+
+**Arguments**:
+- `theta-series` (E8ThetaSeries): Theta series instance
+- `n` (integer): Coefficient index
+
+**Returns**: Integer coefficient value
+
+**Example**:
+```elisp
+(require 'meta-log-e8-theta)
+(let ((theta (meta-log-e8-theta-series-create 10)))
+  (meta-log-e8-theta-coefficient theta 1))  ; Returns 240
+```
+
+### `meta-log-e8-theta-predict-quorum-stability` (function)
+
+Predict election quorum stability using theta series.
+
+**Signature**: `(meta-log-e8-theta-predict-quorum-stability theta-series voter-features)`
+
+**Returns**: Plist with :stability-score, :qqf-determinant, :theta-growth, :form-type
+

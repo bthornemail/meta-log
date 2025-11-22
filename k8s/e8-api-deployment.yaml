@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: e8-api
+  namespace: meta-log
+  labels:
+    app: e8-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: e8-api
+  template:
+    metadata:
+      labels:
+        app: e8-api
+    spec:
+      containers:
+      - name: e8-api
+        image: meta-log/e8-api:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+          name: http
+        envFrom:
+        - configMapRef:
+            name: e8-api-config
+        env:
+        - name: E8_GRAPH_PATH
+          value: "/data/e8-graph.json"
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "4Gi"
+            cpu: "2000m"
+        livenessProbe:
+          httpGet:
+            path: /api/v1/health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /api/v1/health
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        volumeMounts:
+        - name: e8-data
+          mountPath: /data
+      volumes:
+      - name: e8-data
+        persistentVolumeClaim:
+          claimName: e8-data-pvc
+

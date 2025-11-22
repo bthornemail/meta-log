@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: meta-log
+
+resources:
+  - namespace.yaml
+  - e8-api-configmap.yaml
+  - e8-api-deployment.yaml
+  - e8-api-service.yaml
+  - e8-api-pvc.yaml
+  - mqtt-broker-deployment.yaml
+  - mqtt-broker-service.yaml
+  - meta-log-deployment.yaml
+  - meta-log-service.yaml
+

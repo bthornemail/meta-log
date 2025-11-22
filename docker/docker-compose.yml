@@ -1,4 +1,26 @@
 services:
+  e8-api:
+    build:
+      context: ../services/e8-api
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - E8_API_HOST=0.0.0.0
+      - E8_API_PORT=8000
+      - E8_GRAPH_PATH=/data/e8-graph.json
+      - E8_MAX_NORM=20
+      - WEYL_ORBIT_MAX_SIZE=100
+      - SHORTEST_PATH_MAX_STEPS=48
+    volumes:
+      - e8-data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
   mqtt-broker:
     image: eclipse-mosquitto:2.0
     ports:
@@ -27,8 +49,13 @@ services:
       - META_LOG_MQTT_BROKER=mqtt://mqtt-broker:1883
       - META_LOG_FEDERATION_BLACKBOARD=/root/automaton-evolutions/files/blackboard.org
       - META_LOG_ENABLE_FEDERATION=1
+      - E8_API_URL=http://e8-api:8000
     depends_on:
       - mqtt-broker
+      - e8-api
     command: sh -c "emacs --daemon --eval '(server-start)' --eval '(meta-log-initialize)' && tail -f /dev/null"
     restart: unless-stopped
+
+volumes:
+  e8-data:
 

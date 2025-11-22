@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: meta-log
+  namespace: meta-log
+  labels:
+    app: meta-log
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: meta-log
+  template:
+    metadata:
+      labels:
+        app: meta-log
+    spec:
+      containers:
+      - name: meta-log
+        image: meta-log/meta-log:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+          name: http
+        env:
+        - name: META_LOG_AUTOMATA_PATH
+          value: "/root/automaton-evolutions"
+        - name: META_LOG_BLACKBOARD_PATH
+          value: "/root/automaton-evolutions/files/blackboard.org"
+        - name: META_LOG_R5RS_ENGINE_PATH
+          value: "/root/r5rs-canvas-engine.scm"
+        - name: META_LOG_MQTT_BROKER
+          value: "mqtt://mqtt-broker:1883"
+        - name: META_LOG_FEDERATION_BLACKBOARD
+          value: "/root/automaton-evolutions/files/blackboard.org"
+        - name: META_LOG_ENABLE_FEDERATION
+          value: "1"
+        - name: E8_API_URL
+          value: "http://e8-api:8000"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        volumeMounts:
+        - name: automaton-evolutions
+          mountPath: /root/automaton-evolutions
+        - name: r5rs-engine
+          mountPath: /root/r5rs-canvas-engine.scm
+      volumes:
+      - name: automaton-evolutions
+        persistentVolumeClaim:
+          claimName: meta-log-data-pvc
+      - name: r5rs-engine
+        configMap:
+          name: r5rs-engine-config
+

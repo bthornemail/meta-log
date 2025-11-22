@@ -49,18 +49,34 @@ navigation:
     url: /MODULES
   - title: API Reference
     url: /API_REFERENCE
-  - title: Federation Guide
-    url: /FEDERATION_GUIDE
-  - title: Crypto Guide
-    url: /CRYPTO_GUIDE
-  - title: Protocol Handlers
-    url: /PROTOCOL_HANDLERS
-  - title: Template Discovery
-    url: /TEMPLATE-DISCOVERY-BRIDGE
-  - title: Better than LLM
-    url: /BETTER-THAN-LLM
-  - title: Potential Additions
-    url: /POTENTIAL-ADDITIONS
+  - title: Guides
+    children:
+      - title: Federation Guide
+        url: /FEDERATION_GUIDE
+      - title: Crypto Guide
+        url: /CRYPTO_GUIDE
+      - title: Template Discovery
+        url: /TEMPLATE-DISCOVERY-BRIDGE
+      - title: Better than LLM
+        url: /BETTER-THAN-LLM
+  - title: Advanced Concepts
+    children:
+      - title: Geometric Consensus
+        url: /GEOMETRIC_CONSENSUS
+      - title: UTCT Framework
+        url: /UTCT_FRAMEWORK
+      - title: 3D Computational Manifolds
+        url: /3D_COMPUTATIONAL_MANIFOLDS
+      - title: Network Partitions
+        url: /NETWORK_PARTITIONS
+  - title: Theory
+    children:
+      - title: Concepts
+        url: /concepts/
+      - title: Research
+        url: /research/
+      - title: Architecture
+        url: /architecture/
 
 # Exclude from processing
 exclude:

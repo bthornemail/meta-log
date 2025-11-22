@@ -42,6 +42,9 @@
 ;; - meta-log-template-federation: Federated template sharing
 ;; - meta-log-canvas-api: Canvas API integration
 ;; - meta-log-geometric-consensus: Geometric consensus foundation
+;; - meta-log-partition: Network partition detection via Betti numbers
+;; - meta-log-utct: Universal Tuple Cryptographic Transform framework
+;; - meta-log-3d-projection: 2D to 3D CanvasL projection system
 ;;
 ;; To use federation features, add to your init.el:
 ;;   (require 'meta-log)
@@ -88,6 +91,9 @@
  (require 'meta-log-canvas-api)
 ;; (require 'meta-log-template-federation)
  (require 'meta-log-geometric-consensus)
+ (require 'meta-log-partition)
+ (require 'meta-log-utct)
+ (require 'meta-log-3d-projection)
 
 ;;;###autoload
 (defun meta-log-initialize ()

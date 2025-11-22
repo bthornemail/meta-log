@@ -50,6 +50,21 @@ meta-log is an intelligent knowledge management system that combines:
 - **Collective Intelligence**: Collaborative knowledge building
 - **Verifiable Computation**: Computation verification and proof checking
 - **Geometric Consensus**: Consensus algorithms based on topology
+- **Network Partition Detection**: Betti number-based partition detection (O(v) complexity)
+- **UTCT Framework**: Universal Tuple Cryptographic Transform for state management
+- **3D Projection**: 2D CanvasL to 3D projective space projection with AR/VR support
+- **Federated RBAC**: Geometric permission manifold with BIP32 HD path derivation
+
+### Metaverse Structure
+
+The system includes a geometric metaverse structure in `/metaverse/`:
+- `shape.canvasl` - 8D affine space + S7 at infinity
+- `centroid.canvasl` - Statistical center + anomaly detection
+- `topology.canvasl` - Left bipartition (affine/GCD/what things ARE)
+- `system.canvasl` - Right bipartition (projective/LCM/what things DO)
+- `automaton.canvasl` - Unified self-reference
+
+See [dev-docs/research/](dev-docs/research/) for detailed research documentation.
 
 See [docs/MODULES.md](docs/MODULES.md) for detailed documentation on optional modules.
 

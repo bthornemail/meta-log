@@ -1,0 +1,25 @@
+@version 1.0
+@schema frbac-geometric-v1
+@dimension 4D
+@branch 01-ontology
+@visual obsidian-canvas + webgl-3d
+@render manifold-os
+@dual bip32-speck256
+
+{"id":"RootDomain", "type":"global-icosahedron", "vertices":12, "encoding":"{3,5}", "threshold":0.25, "icon":"🌐", "bipartite":{"partition":"topology", "bqf":{"coefficients":[1,1,1], "form":"x²+xy+y²", "signature":"pairing"}}}
+{"id":"Federation", "type":"cube", "vertices":8, "encoding":"{4,3}", "parent":"#RootDomain", "threshold":0.50, "icon":"🏢", "bipartite":{"partition":"topology", "bqf":{"coefficients":[1,1,1], "form":"x²+xy+y²", "signature":"pairing"}}}
+{"id":"Enterprise", "type":"tetrahedron", "vertices":4, "encoding":"{3,3}", "parent":"#Federation", "threshold":0.75, "icon":"🏭", "bipartite":{"partition":"topology", "bqf":{"coefficients":[1,1,1], "form":"x²+xy+y²", "signature":"pairing"}}}
+{"id":"Division", "type":"octahedron", "vertices":6, "encoding":"{3,4}", "parent":"#Enterprise", "dual":"#Cube", "icon":"📊", "bipartite":{"partition":"topology", "bqf":{"coefficients":[1,1,1], "form":"x²+xy+y²", "signature":"pairing"}}}
+{"id":"Team", "type":"vertex", "vertices":1, "encoding":"{ }", "parent":"#Division", "icon":"👥", "bipartite":{"partition":"topology", "bqf":{"coefficients":[0,0,0], "form":"0", "signature":"identity"}}}
+
+{"id":"BIP32Derivation", "type":"path", "structure":"m/domain/org/dept/project/individual", "crypto":"speck256-hd", "verifies":"#Team", "bipartite":{"partition":"system", "bqf":{"coefficients":[1,1,1], "form":"x²+xy+y²", "signature":"pairing"}}}
+
+{"id":"edge:RootDomain→Federation", "type":"edge", "from":"#RootDomain", "to":"#Federation", "label":"delegates", "constraint":"φ(V)=0.25", "proof":"algebraic-duality", "bipartite":{"type":"vertical", "mapping":"root→federation", "bqf":{"coefficients":[1,1,1], "form":"x²+xy+y²", "signature":"pairing"}}}
+{"id":"edge:Federation→Enterprise", "type":"edge", "from":"#Federation", "to":"#Enterprise", "label":"inherits", "constraint":"β₀=1", "proof":"cross-domain", "bipartite":{"type":"vertical", "mapping":"federation→enterprise", "bqf":{"coefficients":[1,1,1], "form":"x²+xy+y²", "signature":"pairing"}}}
+{"id":"edge:BIP32Derivation→Team", "type":"edge", "from":"#BIP32Derivation", "to":"#Team", "label":"maps-to", "constraint":"partition-safe", "proof":"speck256-signature", "bipartite":{"type":"horizontal", "mapping":"path→team", "bqf":{"coefficients":[1,1,1], "form":"x²+xy+y²", "signature":"pairing"}}}
+
+{"id":"FRBAC_ENGINE", "type":"executable", "r5rs-call":"(define (canAccess subject resource action) (derive-permission subject resource action))", "typescript":"new FederatedGeometricRBAC()", "bipartite":{"partition":"system", "bqf":{"coefficients":[1,1,1], "form":"x²+xy+y²", "signature":"pairing"}}}
+{"id":"Validation", "type":"beta-check", "result":{"valid":true,"beta_0":1,"threshold":0.5}, "bipartite":{"partition":"topology", "bqf":{"coefficients":[1,1,1], "form":"x²+xy+y²", "signature":"pairing"}}}
+
+{"id":"Economic_Integration", "type":"include", "links":["../token.json","../marketplace.json","../service.json"], "role":"permission-for-nfts", "bipartite":{"partition":"topology", "bqf":{"coefficients":[1,1,1], "form":"x²+xy+y²", "signature":"pairing"}}}
+

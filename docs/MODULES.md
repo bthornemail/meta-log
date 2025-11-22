@@ -325,6 +325,8 @@ These modules are loaded automatically when you `(require 'meta-log)`:
 - Topological agreement
 - Dimensional consensus
 - Shape-based voting
+- Polyhedral thresholds
+- Proof certificate generation
 
 **Dependencies**:
 - meta-log-federation (for multi-peer consensus)
@@ -336,6 +338,81 @@ These modules are loaded automatically when you `(require 'meta-log)`:
 ```
 
 **External Dependencies**: None
+
+**Documentation**: See [Geometric Consensus](../GEOMETRIC_CONSENSUS.md) for complete details.
+
+---
+
+#### meta-log-utct
+**Purpose**: Universal Tuple Cryptographic Transform framework
+
+**Features**:
+- Unified state machine (T_{n+1} = T_n + ΔT)
+- Branch cut resolution
+- Harmony verification
+- State delta compression
+
+**Dependencies**:
+- None (pure Elisp implementation)
+
+**Usage**:
+```elisp
+(require 'meta-log-utct)
+(meta-log-utct-apply-transformation state delta)
+```
+
+**External Dependencies**: None
+
+**Documentation**: See [UTCT Framework](../UTCT_FRAMEWORK.md) for complete details.
+
+---
+
+#### meta-log-3d-manifolds
+**Purpose**: 3D Computational Manifold Framework
+
+**Features**:
+- Polynomial type system (8-type basis)
+- M-expression to S-expression compilation
+- Evaluation trace generation
+- Cryptographic spine
+- Multi-agent intelligence
+
+**Dependencies**:
+- meta-log-r5rs (for Scheme evaluation)
+
+**Usage**:
+```elisp
+(require 'meta-log-3d-manifolds)
+(meta-log-3d-manifold-evaluate m-expression)
+```
+
+**External Dependencies**: None
+
+**Documentation**: See [3D Computational Manifolds](../3D_COMPUTATIONAL_MANIFOLDS.md) for complete details.
+
+---
+
+#### meta-log-network-partitions
+**Purpose**: Network partition handling via geometric duality
+
+**Features**:
+- Betti number partition detection (β₀)
+- Geometric decomposition
+- Dual-based recovery
+- Partition-aware consensus
+
+**Dependencies**:
+- meta-log-geometric-consensus
+
+**Usage**:
+```elisp
+(require 'meta-log-network-partitions)
+(meta-log-network-partitions-detect vertices)
+```
+
+**External Dependencies**: None
+
+**Documentation**: See [Network Partitions](../NETWORK_PARTITIONS.md) for complete details.
 
 ---
 

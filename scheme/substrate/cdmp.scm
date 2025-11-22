@@ -9,9 +9,24 @@
 ;;; Code:
 
 ;; Load all substrate modules
-(load "substrate/runtime.scm")
-(load "substrate/binary.scm")
-(load "substrate/waveform.scm")
+;; Note: When loaded from r5rs-canvas-engine.scm, paths are relative to scheme/
+;; But when this file loads them, we need paths relative to this file's location
+;; Since we're in scheme/substrate/, we use ../substrate/ to go up and back down
+;; Actually, Guile's load resolves relative to current working directory, not file location
+;; So we need to ensure CWD is scheme/ when loading, or use absolute paths
+;; For now, use relative paths that work when CWD is scheme/
+(load "../substrate/runtime.scm")
+(load "../substrate/binary.scm")
+(load "../substrate/waveform.scm")
+
+;; Helper: bytevector to list (R5RS compatible)
+(define (bytevector->list bv)
+  "Convert bytevector to list of integers."
+  (let ((len (bytevector-length bv))
+        (result '()))
+    (do ((i (- len 1) (- i 1)))
+        ((< i 0) result)
+      (set! result (cons (bytevector-u8-ref bv i) result)))))
 
 ;; Binary → Waveform Mapping
 
@@ -21,20 +36,23 @@ CBS-ID: URI or ID of CBS
 METHOD: 'direct 'frequency 'modulation 'wdl
 PARAMS: alist with sample-rate, bit-depth, channels, etc.
 Returns (waveform-object uri)."
-  (let ((cbs (substrate-get-memory cbs-id))
-        (bytes (list-ref cbs 2)))
-    (if (not (bytevector? bytes))
-        (set! bytes (list->bytevector bytes)))
-    (case method
-      ((direct)
-       (binary-to-waveform-direct bytes params))
-      ((frequency)
-       (binary-to-waveform-frequency bytes params))
-      ((modulation)
-       (binary-to-waveform-modulation bytes params))
-      ((wdl)
-       (binary-to-waveform-wdl bytes params))
-      (else (error "Unknown mapping method" method)))))
+  (let* ((cbs (substrate-get-memory cbs-id)))
+    (if (not cbs)
+        (error "CBS not found" cbs-id))
+    (let* ((bytes (list-ref cbs 2))
+           (bytes-vec (if (not (bytevector? bytes))
+                          (list->bytevector bytes)
+                          bytes)))
+      (case method
+        ((direct)
+         (binary-to-waveform-direct bytes-vec params))
+        ((frequency)
+         (binary-to-waveform-frequency bytes-vec params))
+        ((modulation)
+         (binary-to-waveform-modulation bytes-vec params))
+        ((wdl)
+         (binary-to-waveform-wdl bytes-vec params))
+        (else (error "Unknown mapping method" method))))))
 
 (define (binary-to-waveform-direct bytes params)
   "Direct encoding: bytes as samples."

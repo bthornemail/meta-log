@@ -9,8 +9,8 @@
 ;;; Code:
 
 ;; Load runtime and binary functions
-(load "substrate/runtime.scm")
-(load "substrate/binary.scm")
+(load "../substrate/runtime.scm")
+(load "../substrate/binary.scm")
 
 ;; Waveform Substrate Format
 (define (make-waveform-substrate time-domain frequency-domain padic-signature e8-signature meta)

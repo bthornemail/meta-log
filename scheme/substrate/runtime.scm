@@ -9,6 +9,15 @@
 
 ;;; Code:
 
+;; Use Guile modules for bytevector and hash-table support
+(cond-expand
+  (guile
+   (use-modules (rnrs bytevectors)
+                (srfi srfi-69)))
+  (else
+   ;; R5RS fallback - would need alternative implementations
+   #f))
+
 ;; Helper functions for alist operations (not in R5RS)
 (define (assoc-ref alist key)
   "Get value from alist by key."
@@ -33,21 +42,26 @@
         ((= i 16))
       (bytevector-u8-set! random-bytes i (random 256)))
     ;; Format as UUID v4 (simplified - use number->string with base 16)
-    (let ((hex-chars "0123456789abcdef")
-          (hex-byte (lambda (b)
-                      (string-append
-                       (string (string-ref hex-chars (quotient b 16)))
-                       (string (string-ref hex-chars (modulo b 16)))))))
+    (let* ((hex-chars "0123456789abcdef")
+           (extract-bytes (lambda (start end)
+                            (let ((result '()))
+                              (do ((i start (+ i 1)))
+                                  ((= i end) (reverse result))
+                                (set! result (cons (bytevector-u8-ref random-bytes i) result))))))
+           (hex-byte (lambda (b)
+                       (string-append
+                        (string (string-ref hex-chars (quotient b 16)))
+                        (string (string-ref hex-chars (modulo b 16)))))))
       (string-append
-       (apply string-append (map hex-byte (bytevector->list (bytevector-copy random-bytes 0 4))))
+       (apply string-append (map hex-byte (extract-bytes 0 4)))
        "-"
-       (apply string-append (map hex-byte (bytevector->list (bytevector-copy random-bytes 4 6))))
+       (apply string-append (map hex-byte (extract-bytes 4 6)))
        "-"
-       (apply string-append (map hex-byte (bytevector->list (bytevector-copy random-bytes 6 8))))
+       (apply string-append (map hex-byte (extract-bytes 6 8)))
        "-"
-       (apply string-append (map hex-byte (bytevector->list (bytevector-copy random-bytes 8 10))))
+       (apply string-append (map hex-byte (extract-bytes 8 10)))
        "-"
-       (apply string-append (map hex-byte (bytevector->list (bytevector-copy random-bytes 10 16))))))))
+       (apply string-append (map hex-byte (extract-bytes 10 16)))))))
 
 ;; Current timestamp (ISO 8601 format)
 ;; Placeholder - in real implementation use proper time functions
@@ -60,12 +74,24 @@ Placeholder implementation."
 (define (content-hash data meta)
   ;; Placeholder: in real implementation, use SHA3-256
   ;; For now, use a simple hash
-  (let ((combined (string-append (object->string data) (object->string meta))))
-    (do ((i 0 (+ i 1))
-         (hash 0))
-        ((= i (string-length combined))
-         (number->string hash 16)))
-      (set! hash (logxor hash (* (char->integer (string-ref combined i)) 31)))))))
+  (cond-expand
+    (guile
+     (let ((combined (string-append (format #f "~a" data) (format #f "~a" meta))))
+       (do ((i 0 (+ i 1))
+            (hash-val 0))
+           ((= i (string-length combined))
+            (number->string hash-val 16))
+         (set! hash-val (logxor hash-val (* (char->integer (string-ref combined i)) 31))))))
+    (else
+     ;; R5RS fallback - simple string representation
+     (let ((combined (string-append 
+                       (if (string? data) data (number->string (if (list? data) (length data) 0)))
+                       (if (string? meta) meta ""))))
+       (do ((i 0 (+ i 1))
+            (hash-val 0))
+           ((= i (string-length combined))
+            (number->string hash-val 16))
+         (set! hash-val (logxor hash-val (* (char->integer (string-ref combined i)) 31))))))))
 
 ;; Memory Object Format
 (define (make-memory-object data meta constraints)
@@ -91,24 +117,38 @@ CONSTRAINTS: alist of constraints"
 (define (resolve-content-address uri)
   "Resolve mlss:// URI to memory object.
 In real implementation, this would query the content store."
-  (if (and (>= (string-length uri) 17)
-           (string=? (substring uri 0 17) "mlss://sha3-256/"))
-      (let ((hash (substring uri 17)))
-        ;; Lookup in content store (placeholder)
-        (lookup-by-hash hash))
-      (error "Invalid mlss:// URI format" uri)))
+  (let ((prefix "mlss://sha3-256/"))
+    (if (and (>= (string-length uri) (string-length prefix))
+             (string=? (substring uri 0 (string-length prefix)) prefix))
+        (let ((hash (substring uri (string-length prefix))))
+          ;; Lookup in content store
+          (let ((obj (lookup-by-hash hash)))
+            (if obj
+                obj
+                (error "Content not found" hash))))
+        (error "Invalid mlss:// URI format" uri))))
 
 ;; Content store (in-memory for now)
-(define *content-store* (make-hash-table))
+;; Use alist as fallback if hash-table not available
+(cond-expand
+  (guile
+   (use-modules (srfi srfi-69))
+   (define *content-store* (make-hash-table)))
+  (else
+   (define *content-store* '())))  ; Fallback to alist
 
 (define (lookup-by-hash hash)
   "Lookup memory object by content hash."
-  (hash-table-ref *content-store* hash #f))
+  (cond-expand
+    (guile (hash-table-ref *content-store* hash #f))
+    (else (assoc-ref *content-store* hash))))
 
 (define (store-memory-object obj)
   "Store memory object in content store."
   (let ((hash (list-ref obj 5)))  ; hash is 6th element
-    (hash-table-set! *content-store* hash obj)
+    (cond-expand
+      (guile (hash-table-set! *content-store* hash obj))
+      (else (set! *content-store* (cons (cons hash obj) *content-store*))))
     obj))
 
 ;; Resource Limits
@@ -185,15 +225,16 @@ In real implementation, this would query the content store."
 (define (substrate-create-memory data meta)
   "Create a memory object from data and metadata.
 Returns memory object with content address."
-  (let ((constraints '((exec . "none")
-                       (max-len . ,(if (bytevector? data)
-                                       (bytevector-length data)
-                                       (length data)))
-                       (reversible . #t)))
-        (obj (make-memory-object data meta constraints)))
+  (let* ((max-len (if (bytevector? data)
+                      (bytevector-length data)
+                      (length data)))
+         (constraints (list (cons 'exec "none")
+                           (cons 'max-len max-len)
+                           (cons 'reversible #t)))
+         (obj (make-memory-object data meta constraints)))
     (store-memory-object obj)
-    (let ((hash (list-ref obj 5))
-          (uri (content-address hash)))
+    (let ((hash-str (list-ref obj 5))
+          (uri (content-address (list-ref obj 5))))
       (list obj uri))))
 
 (define (substrate-get-memory uri-or-id)

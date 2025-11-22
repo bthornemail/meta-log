@@ -9,8 +9,9 @@
 ;;; Code:
 
 ;; Load Q* core
-(load "qstar/core.scm")
-(load "qstar/scoring.scm")
+;; Paths relative to scheme/ directory
+(load "../qstar/core.scm")
+(load "../qstar/scoring.scm")
 
 ;; A* Node
 (define (make-astar-node state g-cost h-cost parent action)

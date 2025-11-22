@@ -8,7 +8,8 @@
 
 ;;; Code:
 
-;; Load runtime functions (in real implementation, these would be loaded)
+;; Load runtime functions
+(load "../substrate/runtime.scm")
 
 ;; mlss:// URI Scheme
 
@@ -29,7 +30,7 @@ Returns (algorithm . hash) or #f if invalid."
         (if (not slash-pos)
             #f
             (cons (string->symbol (substring rest 0 slash-pos))
-                  (substring rest (+ slash-pos 1))))))))
+                  (substring rest (+ slash-pos 1)))))))
 
 (define (mlss-uri? uri)
   "Check if string is a valid mlss:// URI."
@@ -39,8 +40,14 @@ Returns (algorithm . hash) or #f if invalid."
 
 ;; Content Store Interface
 
-(define *content-store-by-hash* (make-hash-table))
-(define *content-store-by-id* (make-hash-table))
+(cond-expand
+  (guile
+   (use-modules (srfi srfi-69))
+   (define *content-store-by-hash* (make-hash-table))
+   (define *content-store-by-id* (make-hash-table)))
+  (else
+   (define *content-store-by-hash* '())
+   (define *content-store-by-id* '())))
 
 (define (store-by-content-address obj)
   "Store object by content address.
@@ -49,7 +56,9 @@ Returns mlss:// URI."
                   (list-ref obj 5)  ; hash is 6th element in memory-object/cbs
                   (content-hash obj '())))
         (algorithm 'sha3-256))
-    (hash-table-set! *content-store-by-hash* hash obj)
+    (cond-expand
+      (guile (hash-table-set! *content-store-by-hash* hash obj))
+      (else (set! *content-store-by-hash* (cons (cons hash obj) *content-store-by-hash*))))
     (make-mlss-uri algorithm hash)))
 
 (define (resolve-content-address uri)
@@ -59,7 +68,9 @@ Returns object or #f if not found."
     (if (not parsed)
         #f
         (let ((hash (cdr parsed)))
-          (hash-table-ref *content-store-by-hash* hash #f)))))
+          (cond-expand
+            (guile (hash-table-ref *content-store-by-hash* hash #f))
+            (else (assoc-ref *content-store-by-hash* hash)))))))
 
 ;; Content Address Resolution
 

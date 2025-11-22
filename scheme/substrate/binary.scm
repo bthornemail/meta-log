@@ -8,7 +8,17 @@
 
 ;;; Code:
 
-;; Load runtime functions (in real implementation, these would be loaded)
+;; Load runtime functions
+(load "../substrate/runtime.scm")
+
+;; Helper: list to bytevector
+(define (list->bytevector lst)
+  "Convert list of integers to bytevector."
+  (let ((bv (make-bytevector (length lst))))
+    (do ((i 0 (+ i 1))
+         (remaining lst (cdr remaining)))
+        ((null? remaining) bv)
+      (bytevector-u8-set! bv i (car remaining)))))
 
 ;; CBS Format
 (define (make-cbs bytes meta)
@@ -65,17 +75,19 @@ DIRECTION: 'left or 'right"
         (meta (list-ref cbs 3)))
     (if (not (bytevector? bytes))
         (set! bytes (list->bytevector bytes)))
-    (let ((result (make-bytevector (bytevector-length bytes))))
+    (let ((result (make-bytevector (bytevector-length bytes)))
+          (n-bits-mod (modulo n-bits 8)))  ; Normalize to 0-7 range
       (do ((i 0 (+ i 1)))
           ((= i (bytevector-length bytes)))
         (let ((byte (bytevector-u8-ref bytes i)))
           (bytevector-u8-set! result
                               i
-                              (if (eq? direction 'left)
-                                  (logior (ash byte n-bits)
-                                          (ash byte (- n-bits 8)))
-                                  (logior (ash byte (- n-bits))
-                                          (ash byte (- 8 n-bits)))))))
+                              (logand 255  ; Mask to 8 bits
+                                      (if (eq? direction 'left)
+                                          (logior (ash (logand byte 255) n-bits-mod)
+                                                  (ash (logand byte 255) (- n-bits-mod 8)))
+                                          (logior (ash (logand byte 255) (- n-bits-mod))
+                                                  (ash (logand byte 255) (- 8 n-bits-mod))))))))
       (make-cbs result
                 (append meta
                         `((transform . "rotate")
@@ -89,11 +101,11 @@ Returns new CBS with subset of bytes."
         (meta (list-ref cbs 3)))
     (if (not (bytevector? bytes))
         (set! bytes (list->bytevector bytes)))
-    (let ((length (- end start))
-          (result (make-bytevector length)))
+    (let ((slice-len (- end start))
+          (result (make-bytevector (- end start))))
       (do ((i 0 (+ i 1))
            (j start (+ j 1)))
-          ((= i length))
+          ((= i slice-len))
         (bytevector-u8-set! result i (bytevector-u8-ref bytes j)))
       (make-cbs result
                 (append meta

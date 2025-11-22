@@ -9,7 +9,7 @@
 ;;; Code:
 
 ;; Load substrate modules
-;; In real implementation, adjust paths as needed
+;; All paths relative to scheme/ directory
 (load "substrate/runtime.scm")
 (load "substrate/binary.scm")
 (load "substrate/provenance.scm")

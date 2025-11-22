@@ -8,7 +8,7 @@
 ;;; Code:
 
 ;; Load waveform functions
-(load "substrate/waveform.scm")
+(load "../substrate/waveform.scm")
 
 ;; WDL Parser (simplified - WDL is S-expression-like)
 (define (wdl-parse source)

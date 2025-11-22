@@ -38,9 +38,9 @@ PRIORITY: integer priority (higher = evaluated first)"
              (best (car registry)))
     (if (null? remaining)
         best
-        (let ((current (car remaining))
-              (best-pri (list-ref best 2))
-              (current-pri (list-ref current 2)))
+        (let* ((current (car remaining))
+               (best-pri (list-ref best 2))
+               (current-pri (list-ref current 2)))
           (if (> current-pri best-pri)
               (loop (cdr remaining) current)
               (loop (cdr remaining) best))))))

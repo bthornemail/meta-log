@@ -33,9 +33,9 @@ WAVEFUNCTION: complex amplitude vector"
 (define (quantum-to-cbs quantum-state)
   "Encode quantum state as CBS.
 Returns CBS object."
-  (let ((qubits (list-ref quantum-state 1))
-        (wavefunction (list-ref quantum-state 2))
-        (bytes (flatten-quantum-state wavefunction)))
+  (let* ((qubits (list-ref quantum-state 1))
+         (wavefunction (list-ref quantum-state 2))
+         (bytes (flatten-quantum-state wavefunction)))
     (make-cbs bytes
               `((encoding . "quantum-superposition")
                 (qubits . ,qubits)
@@ -51,13 +51,18 @@ Placeholder implementation."
 (define (physics-quantum-create qubits wavefunction)
   "Create quantum state.
 Returns (quantum-state cbs-uri)."
-  (let ((quantum (make-quantum-state qubits wavefunction))
-        (cbs (quantum-to-cbs quantum)))
-    (store-memory-object quantum)
+  (let* ((quantum (make-quantum-state qubits wavefunction))
+         (cbs (quantum-to-cbs quantum))
+         (cbs-hash (if (and (list? cbs) (>= (length cbs) 6))
+                      (let ((hash-val (list-ref cbs 5)))
+                        (if (string? hash-val)
+                            hash-val
+                            (number->string hash-val)))
+                      "placeholder-hash"))
+         (cbs-uri (string-append "mlss://sha3-256/" cbs-hash)))
+    ;; Store CBS as memory object, quantum state is just a data structure
     (store-memory-object cbs)
-    (let ((cbs-hash (list-ref cbs 5))
-          (cbs-uri (content-address cbs-hash)))
-      (list quantum cbs-uri))))
+    (list quantum cbs-uri)))
 
 ;; Functions are exported by default in R5RS
 

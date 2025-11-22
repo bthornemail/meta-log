@@ -33,6 +33,7 @@
 ;; Load physics modules
 (load "physics/quantum.scm")
 (load "physics/gr.scm")
+(load "physics/qft.scm")
 
 ;; Load vision modules
 (load "vision/pipeline.scm")

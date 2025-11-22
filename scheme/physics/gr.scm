@@ -12,9 +12,9 @@
   "Compute Einstein field equations from energy-momentum tensor.
 ENERGY-MOMENTUM: E8 energy-momentum representation
 Returns field equations."
-  (let ((ricci-tensor (compute-ricci energy-momentum))
-        (ricci-scalar (trace ricci-tensor))
-        (metric (e8-to-metric energy-momentum)))
+  (let* ((ricci-tensor (compute-ricci energy-momentum))
+         (ricci-scalar (trace ricci-tensor))
+         (metric (e8-to-metric energy-momentum)))
     (list 'field-equations
           (tensor-subtract ricci-tensor
                           (tensor-scale metric (/ ricci-scalar 2)))

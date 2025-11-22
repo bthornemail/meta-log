@@ -21,6 +21,22 @@ services:
       timeout: 10s
       retries: 3
 
+  substrate-api:
+    build:
+      context: ../services/substrate-api
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      - SUBSTRATE_API_HOST=0.0.0.0
+      - SUBSTRATE_API_PORT=8001
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
   mqtt-broker:
     image: eclipse-mosquitto:2.0
     ports:
@@ -41,6 +57,7 @@ services:
       - "8080:8080"
     volumes:
       - ./automaton-evolutions:/root/automaton-evolutions
+      - ./scheme:/root/scheme
       - ./r5rs-canvas-engine.scm:/root/r5rs-canvas-engine.scm
     environment:
       - META_LOG_AUTOMATA_PATH=/root/automaton-evolutions
@@ -50,9 +67,11 @@ services:
       - META_LOG_FEDERATION_BLACKBOARD=/root/automaton-evolutions/files/blackboard.org
       - META_LOG_ENABLE_FEDERATION=1
       - E8_API_URL=http://e8-api:8000
+      - SUBSTRATE_API_URL=http://substrate-api:8001
     depends_on:
       - mqtt-broker
       - e8-api
+      - substrate-api
     command: sh -c "emacs --daemon --eval '(server-start)' --eval '(meta-log-initialize)' && tail -f /dev/null"
     restart: unless-stopped
 

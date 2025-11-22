@@ -95,6 +95,11 @@
  (require 'meta-log-utct)
  (require 'meta-log-3d-projection)
 
+;; MLSS Substrate modules (optional - require for substrate features)
+(require 'meta-log-substrate-runtime nil t)
+(require 'meta-log-binary-substrate nil t)
+(require 'meta-log-provenance nil t)
+
 ;;;###autoload
 (defun meta-log-initialize ()
   "Initialize the meta-log system.

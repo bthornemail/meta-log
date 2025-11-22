@@ -32,6 +32,10 @@
 (load "physics/quantum.scm")
 (load "physics/gr.scm")
 
+;; Load vision modules
+(load "vision/pipeline.scm")
+(load "vision/features.scm")
+
 ;; Main API functions are now available from loaded modules
 ;; All functions defined in substrate modules are accessible
 

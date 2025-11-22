@@ -18,6 +18,8 @@
 
 (require 'cl-lib)
 (require 'org)
+(require 'meta-log-quaternion)
+(require 'meta-log-shimura-padic)
 
 ;; BIP39 word list (first 128 words for 12-word mnemonic)
 (defconst meta-log-crypto--bip39-wordlist
@@ -380,6 +382,15 @@ Returns a list of 64 bytes."
   (let ((hash (meta-log-crypto--sha256 (concat key data))))
     ;; Pad to 64 bytes for SHA-512
     (append hash (make-list (- 64 (length hash)) 0))))
+
+(defun meta-log-crypto-derive-key-quaternion (seed path &optional algebra)
+  "Derive key using quaternion algebra basis.
+SEED is the master seed.
+PATH is BIP32 path string.
+ALGEBRA is optional quaternion algebra (default: (-1,-1/ℚ)).
+Returns quaternion element representing the path."
+  (let ((alg (or algebra (meta-log-quaternion-algebra-create -1 -1))))
+    (meta-log-quaternion-bip32-path alg path)))
 
 (defun meta-log-crypto-derive-key (seed path)
   "Derive a BIP32/44 key from seed.

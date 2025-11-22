@@ -14,6 +14,7 @@
 
 (require 'cl-lib)
 (require 'meta-log-geometric-consensus)
+(require 'meta-log-quadratic-forms)
 
 (defun meta-log-find-evolutions-package ()
   "Find automaton-evolutions package installation.
@@ -136,17 +137,28 @@ Returns geometric type symbol or nil."
 (defun meta-log-automata-extract-geometric-consensus (obj)
   "Extract geometric consensus requirements from automaton object.
 OBJ is a parsed JSONL object.
-Returns list of consensus criteria (boolean values)."
+Returns list of consensus criteria (boolean values) with discriminant classification."
   (let ((bipartite (cdr (assq 'bipartite obj)))
-        (criteria '()))
+        (criteria '())
+        (classification nil))
     (when bipartite
       (let ((partition (cdr (assq 'partition bipartite)))
             (bqf (cdr (assq 'bqf bipartite))))
         (when (and partition bqf)
           (let ((coefficients (cdr (assq 'coefficients bqf))))
             (when coefficients
-              (setq criteria (mapcar (lambda (coeff) (> coeff 0)) coefficients)))))))
-    criteria))
+              (setq criteria (mapcar (lambda (coeff) (> coeff 0)) coefficients))
+              ;; Calculate BQF discriminant and classify
+              (let ((bqf-struct (meta-log-bqf-from-coefficients coefficients)))
+                (when bqf-struct
+                  (setq classification (meta-log-bqf-classify bqf-struct))
+                  (setq criteria (append criteria
+                                        `((:discriminant . ,(meta-log-bqf-discriminant bqf-struct))
+                                          (:classification . ,classification)
+                                          (:stable . ,(member classification '(positive-definite negative-definite))))))))))))
+    (if classification
+        (append criteria `((:bqf-classification . ,classification)))
+      criteria)))
 
 (provide 'meta-log-automata)
 

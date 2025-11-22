@@ -20,6 +20,8 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'meta-log-quadratic-forms)
+(require 'meta-log-geometric-alignments)
 
 (defvar meta-log-geometric--type-definitions
   '((tetrahedron . ((vertices . 4) (consensus . 4) (threshold . 1.0) (semantic . MUST_SYSTEM) (context . local)))
@@ -90,7 +92,7 @@ Returns geometric type symbol."
 (defun meta-log-geometric-verify-consensus (geometric-type agrees-list)
   "Verify consensus for GEOMETRIC-TYPE with AGREES-LIST.
 AGREES-LIST is list of boolean values (t/nil for each criterion).
-Returns certificate alist with validation result."
+Returns certificate alist with validation result and quadratic form classification."
   (let* ((type-def (meta-log-geometric-get-type geometric-type))
          (vertices (cdr (assq 'vertices type-def)))
          (required (cdr (assq 'consensus type-def)))
@@ -98,7 +100,22 @@ Returns certificate alist with validation result."
          (semantic (cdr (assq 'semantic type-def)))
          (context (cdr (assq 'context type-def)))
          (agrees-count (length (cl-remove-if-not 'identity agrees-list)))
-         (valid (>= agrees-count required)))
+         (valid (>= agrees-count required))
+         ;; Classify using quadratic forms based on dimension
+         (form-classification
+          (cond
+           ((<= vertices 2)
+            ;; 2D: Use BQF
+            (let ((bqf (meta-log-bqf-create 1 1 1)))
+              (meta-log-bqf-classify bqf)))
+           ((<= vertices 3)
+            ;; 3D: Use TQF (deltoid connection)
+            (let ((tqf (meta-log-tqf-create 1 1 1 0.5 0.5 0.5)))
+              (meta-log-tqf-classify tqf)))
+           (t
+            ;; 4D+: Use QQF (astroid/quaternion connection)
+            (let ((qqf (meta-log-qqf-create 1 1 1 1 0 0 0 0 0 0)))
+              (meta-log-qqf-classify qqf))))))
     `((:geometric-type . ,geometric-type)
       (:vertices . ,vertices)
       (:agrees-count . ,agrees-count)
@@ -107,9 +124,11 @@ Returns certificate alist with validation result."
       (:semantic . ,semantic)
       (:context . ,context)
       (:valid . ,valid)
-      (:proof . ,(format "algebraic_law(%d/%d >= %.3f) -> %s"
+      (:form-classification . ,form-classification)
+      (:proof . ,(format "algebraic_law(%d/%d >= %.3f) -> %s [%s]"
                          agrees-count vertices threshold
-                         (if valid "valid" "invalid"))))))
+                         (if valid "valid" "invalid")
+                         form-classification)))))
 
 (defun meta-log-geometric-must-local (criteria)
   "Verify MUST_LOCAL consensus (Tetrahedron - 4/4 unanimous).

@@ -16,6 +16,7 @@
 
 (require 'cl-lib)
 (require 'meta-log-llm-cache)
+(require 'meta-log-p-adic)
 
 ;;; Configuration
 
@@ -325,6 +326,17 @@ Merges with local patterns."
 ;;; Auto-save
 
 (add-hook 'kill-emacs-hook #'meta-log-llm-learning-save)
+
+;;; p-Adic Feature Integration
+
+(defun meta-log-llm-learning-p-adic-features (voter-graph p)
+  "Extract p-adic features from voter graph for enhanced ML prediction.
+VOTER-GRAPH is a graph structure with closeness features.
+P is a prime for p-adic valuation (default 2).
+Returns enhanced feature vector with p-adic valuations."
+  (let ((p (or p 2)))
+    (when (featurep 'meta-log-p-adic)
+      (meta-log-p-adic-voter-features voter-graph p))))
 
 (provide 'meta-log-llm-learning)
 

@@ -11,3 +11,4 @@
 
 {"id":"category/Transportation & Logistics", "type":"economic-category", "subcategories":["Local Courier Services", "Package Delivery", "Furniture & Large Item Delivery", "Ride Share & Personal Driver", "Airport Transport", "Medical Transport", "Moving & Relocation Services", "Box Truck & Van Services", "Freight & Cargo Transport", "Last-Mile Delivery", "Hot Shot Trucking", "Vehicle Transport", "Storage & Warehousing"], "bipartite":{"partition":"topology", "bqf":{"coefficients":[1,1,1], "form":"x²+xy+y²", "signature":"pairing"}}}
 
+

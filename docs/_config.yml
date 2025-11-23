@@ -43,6 +43,20 @@ defaults:
 navigation:
   - title: Home
     url: /
+  - title: What is Meta-Log?
+    url: /WHAT-IS-META-LOG
+  - title: Why Adopt?
+    url: /WHY-ADOPT
+  - title: Getting Started
+    url: /GETTING-STARTED
+  - title: System Status
+    url: /STATUS
+  - title: Core Concepts
+    url: /CORE-CONCEPTS
+  - title: Autonomy & Awareness
+    url: /AUTONOMY-AWARENESS
+  - title: Architecture
+    url: /ARCHITECTURE
   - title: User Guide
     url: /USER_GUIDE
   - title: Modules

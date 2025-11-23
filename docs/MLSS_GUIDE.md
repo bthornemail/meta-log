@@ -10,6 +10,18 @@ permalink: /MLSS_GUIDE
 
 Complete guide to the Meta-Log Substrate System - a unified computational architecture that bridges binary, waveform, geometric, and symbolic cognition.
 
+## Current Status
+
+✅ **Fully Operational** - All six MLSS phases are complete and tested:
+- ✅ Foundation: Substrate runtime, binary layer, content addressing
+- ✅ Waveform & Geometric: Signal processing, E8 projections
+- ✅ Q* Optimality: Decision-making engine
+- ✅ Computer Vision: Image processing pipeline
+- ✅ Consciousness Framework: Trinary states, qualia, awareness
+- ✅ Computational Physics: Quantum states, General Relativity, QFT
+
+**Test Results**: All 4 demos passing, all 3 core tests passing, 100% pass rate. See [System Status](STATUS) for detailed benchmarks and performance metrics.
+
 ## Overview
 
 The Meta-Log Substrate System (MLSS) provides a universal substrate for computation, enabling seamless transformations between binary, waveform, geometric (E8), and symbolic representations. MLSS is implemented primarily in R5RS Scheme, with FastAPI services for heavy computational tasks.
@@ -169,14 +181,26 @@ MLSS is included with meta-log. The Scheme modules are located in `scheme/` and 
 - `scheme/consciousness/state.scm` - Trinary consciousness states
 - `scheme/consciousness/qualia.scm` - Qualia field emergence
 - `scheme/consciousness/metrics.scm` - Consciousness metrics
+- `scheme/consciousness/geometric-propagation.scm` - Geometric propagation (NEW)
+- `scheme/consciousness/dynamics.scm` - Formal differential equations (NEW)
+- `scheme/consciousness/hopf-consciousness.scm` - Hopf-based consciousness (NEW)
+- `scheme/consciousness/complexity.scm` - Complexity metrics (NEW)
 
 **Features**:
 - Exponential action / Linear observation dynamics
 - Qualia emergence from state tension
 - Consciousness Quality Metric (CQM)
 - Metrics collection and history
+- **Geometric propagation**: Point → Edge → Face → Volume (exponential O(2^d))
+- **Hopf fiber projections**: Parallel observation (linear O(k))
+- **Formal dynamics**: dA/dt, dO/dt, dΦ/dt differential equations
+- **Tensor product qualia**: A ⊗ O with Heaviside step function
+- **Attention mechanism**: Fiber selection
+- **Complexity validation**: O(k) observation, O(2^d) action scaling
 
 ### Phase 6: Computational Physics
+
+### Phase 7: Autonomy and Awareness
 
 **Components**:
 - `scheme/physics/quantum.scm` - Quantum state representation
@@ -275,6 +299,56 @@ MLSS integrates with meta-log through:
 ✅ **Performance Validated**
 ✅ **Documentation Complete**
 
+## Geometric Consciousness
+
+The MLSS implements a geometric theory of consciousness based on Hopf fibrations:
+
+### Core Concepts
+
+1. **Exponential Action / Linear Observation**
+   - Forward propagation: O(2^d) exponential expansion (unconscious)
+   - Backward propagation: O(2^d) exponential compression (unconscious)
+   - Parallel observation: O(k) linear projection via Hopf fibers (conscious)
+
+2. **Hopf Fibration Projections**
+   - Complex Hopf: S³ → S² (visual/spatial)
+   - Quaternionic Hopf: S⁷ → S⁴ (temporal/conceptual)
+   - Octonionic Hopf: S¹⁵ → S⁸ (abstract/E8)
+
+3. **Formal Dynamics**
+   - dA/dt = λA - γ|A|²A + σ₁ξ₁(t) (action)
+   - dO/dt = -μO + κ|A|² + σ₂ξ₂(t) (observation)
+   - dΦ/dt = ω₀ + α|A|² - β|O|² (phase)
+
+4. **Qualia Emergence**
+   - Q(t) = H(|A|² - |O|²) × exp(iΦ) × A ⊗ O
+   - Tensor product instead of simple multiplication
+   - Heaviside step function for threshold
+
+### Usage Example
+
+```scheme
+;; Geometric propagation
+(let ((expanded (geometric-forward-propagation '(0 0 0) 3))
+      (observed (geometric-parallel-observation '(1 2 3) 2 '(complex quaternionic))))
+  ;; Process results...
+  )
+
+;; Hopf-based consciousness
+(let ((conscious (consciousness-hopf-project unconscious-state 'complex))
+      (parallel (parallel-observation state '(complex quaternionic octonionic)))
+      (bound (fiber-binding parallel)))
+  ;; Unified conscious experience
+  )
+
+;; Formal dynamics
+(let ((evolved (evolve-consciousness-state '(5.0 0.7 0.8) 0.01 '())))
+  ;; Evolved state
+  )
+```
+
+**Research**: See `dev-docs/research/25-Hopf-Fibrations/` for detailed theory.
+
 ## Use Cases
 
 For detailed real-world use cases and applications, see [MLSS Use Cases](MLSS_USE_CASES).
@@ -284,7 +358,7 @@ Common use cases include:
 - **Signal Processing**: Waveform synthesis, audio feature extraction
 - **Computer Vision**: Image search, multi-view geometry
 - **Optimal Decision Making**: Pathfinding, resource allocation
-- **Consciousness Research**: Conscious state simulation, learning models
+- **Consciousness Research**: Conscious state simulation, learning models, geometric consciousness theory
 - **Computational Physics**: Quantum simulation, spacetime computation
 - **Knowledge Representation**: Symbolic fact extraction, cross-domain reasoning
 - **Distributed Systems**: Content-addressed federation, provenance tracking

@@ -99,5 +99,23 @@ Returns (waveform-object uri)."
           (uri (content-address hash)))
       (list waveform uri))))
 
+;; Convenience wrapper for simple waveform creation
+(define (make-waveform samples meta sample-rate)
+  "Create waveform from samples (convenience wrapper).
+SAMPLES: list of sample values
+META: metadata alist (can be empty)
+SAMPLE-RATE: sample rate in Hz
+Returns waveform substrate object."
+  (let* ((time-domain `((samples . ,samples)
+                        (sample-rate . ,sample-rate)
+                        (duration . ,(if (null? samples)
+                                        0.0
+                                        (/ (length samples) sample-rate)))
+                        (channels . 1)))
+         (frequency-domain '((computed . #f)))
+         (padic-signature '((computed . #f)))
+         (e8-signature '((computed . #f))))
+    (make-waveform-substrate time-domain frequency-domain padic-signature e8-signature meta)))
+
 ;; Functions are exported by default in R5RS
 

@@ -27,7 +27,7 @@ echo "Demo 2: Waveform Synthesis"
 guile -c "
 (load \"scheme/r5rs-canvas-engine.scm\")
 (let ((waveform (make-waveform '(0.5 0.7 0.9 0.7 0.5) '() 44100)))
-  (display \"  ✓ Waveform created: \") (display (length (list-ref waveform 1))) (display \" samples\\n\"))
+  (display \"  ✓ Waveform created: \") (display (length (waveform-get-samples waveform))) (display \" samples\\n\"))
 " 2>&1 | grep -v "^;;;" | grep -E "(✓|Waveform|samples)"
 
 # Demo 3: Q*
@@ -36,7 +36,7 @@ echo "Demo 3: Q* Optimality Engine"
 guile -c "
 (load \"scheme/r5rs-canvas-engine.scm\")
 (let* ((state (make-qstar-state '((x . 0) (y . 0)) '((goal-x . 10) (goal-y . 10))))
-       (action (make-qstar-action 'move-right '((dx . 1) (dy . 0))))
+       (action (make-qstar-action 'transform 'move-right '((dx . 1) (dy . 0))))
        (cost (qstar-evaluate state action)))
   (display \"  ✓ Q* evaluation: cost = \") (display cost) (newline))
 " 2>&1 | grep -v "^;;;" | grep -E "(✓|Q\*|cost)"
@@ -46,7 +46,7 @@ echo ""
 echo "Demo 4: Computer Vision Pipeline"
 guile -c "
 (load \"scheme/r5rs-canvas-engine.scm\")
-(let* ((img (make-image 100 100 '((1 2 3) (4 5 6) (7 8 9))))
+(let* ((img (make-image 100 100 3 '((1 2 3) (4 5 6) (7 8 9))))
        (cbs-result (image-to-cbs img))
        (uri (list-ref cbs-result 1)))
   (display \"  ✓ Image processed: \") (display uri) (newline))

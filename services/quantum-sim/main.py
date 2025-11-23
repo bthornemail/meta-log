@@ -24,11 +24,15 @@ app.add_middleware(
 
 # Request/Response Models
 class QuantumStateRequest(BaseModel):
+    model_config = {"arbitrary_types_allowed": True}
+
     qubits: int
     wavefunction: Optional[List[complex]] = None
     state_uri: Optional[str] = None
 
 class QuantumCircuitRequest(BaseModel):
+    model_config = {"arbitrary_types_allowed": True}
+
     qubits: int
     gates: List[Dict[str, Any]]
     initial_state: Optional[List[complex]] = None
@@ -39,12 +43,16 @@ class EntanglementRequest(BaseModel):
     entanglement_type: str = "bell"
 
 class QuantumStateResponse(BaseModel):
+    model_config = {"arbitrary_types_allowed": True}
+
     qubits: int
     wavefunction: List[complex]
     probabilities: List[float]
     state_uri: str
 
 class CircuitSimulationResponse(BaseModel):
+    model_config = {"arbitrary_types_allowed": True}
+
     final_state: List[complex]
     probabilities: List[float]
     execution_time_ms: float

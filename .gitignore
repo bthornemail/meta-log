@@ -26,3 +26,5 @@ mosquitto/log/
 
 # Logs
 *.log
+
+venv/

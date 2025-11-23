@@ -101,9 +101,26 @@ Returns alist of (component . cost)."
   0.0)
 
 (define (qstar-apply-action state action)
-  "Apply action to state, return next state."
-  ;; Placeholder - would actually transform state
-  state)
+  "Apply action to state, return next state.
+Now integrates with action executor for actual execution."
+  ;; Load action executor
+  (load "../action/executor.scm")
+  ;; Execute action
+  (let* ((action-result (execute-action action))
+         (success? (list-ref action-result 2))
+         (outcome (list-ref action-result 3))
+         (feedback (action-feedback action action-result))
+         (history (store-action-history action action-result feedback)))
+    ;; Update state based on action outcome
+    ;; For now, return state with action outcome stored
+    (let ((updated-properties (cons `((last-action . ,action)
+                                     (last-action-result . ,action-result)
+                                     (last-action-feedback . ,feedback))
+                                   (list-ref state 3))))
+      (list 'qstar-state
+            (list-ref state 1)  ; Keep same UUID
+            (list-ref state 2)  ; Keep same layers
+            updated-properties))))
 
 (define (qstar-goal-p state)
   "Check if state is a goal state."

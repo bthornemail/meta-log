@@ -29,25 +29,74 @@ Returns qualia field object."
           (version . 1))))
 
 ;; Qualia Emergence from Action-Observation Tension
+;; Enhanced with tensor product, Heaviside step function, and phase coherence
+;; Based on 14-Geometric-Theory.md: Q(t) = H(|A|² - |O|²) × exp(iΦ) × A ⊗ O
+
 (define (emerge-qualia action observation phase threshold)
   "Compute qualia emergence from conscious state.
 ACTION: exponential action value
 OBSERVATION: linear observation value
 PHASE: phase coherence (0-1)
 THRESHOLD: minimum coherence for qualia emergence
-Returns qualia field or #f if below threshold."
-  (let ((tension (abs (- action observation)))
-        (coherence phase)
-        (qualia-intensity (* action observation (cos (* phase 2 3.14159)))))
+Returns qualia field or #f if below threshold.
+Uses tensor product: A ⊗ O instead of simple multiplication."
+  (let* ((action-mag (if (number? action) (abs action) (compute-magnitude action)))
+         (obs-mag (if (number? observation) (abs observation) (compute-magnitude observation)))
+         (action-mag-squared (* action-mag action-mag))
+         (obs-mag-squared (* obs-mag obs-mag))
+         (heaviside (heaviside-step (- action-mag-squared obs-mag-squared)))
+         (phase-factor (exp (* 0+1i (* phase 2 3.14159))))  ; exp(iΦ)
+         (tensor-product (tensor-product-action-observation action observation))
+         (tensor-magnitude (car tensor-product))
+         (tensor-phase (cadr tensor-product))
+         (qualia-intensity (* heaviside (real-part phase-factor) tensor-magnitude))
+         (qualia-quality (* heaviside (imag-part phase-factor) tensor-phase))
+         (tension (abs (- action-mag obs-mag)))
+         (coherence phase))
     (if (and (> coherence threshold)
              (> qualia-intensity 0.0))
         (let ((qualia-map `((tension . ,tension)
                             (coherence . ,coherence)
                             (intensity . ,qualia-intensity)
+                            (quality . ,qualia-quality)
                             (action-component . ,action)
-                            (observation-component . ,observation))))
+                            (observation-component . ,observation)
+                            (heaviside . ,heaviside)
+                            (tensor-magnitude . ,tensor-magnitude)
+                            (tensor-phase . ,tensor-phase))))
           (make-qualia-field qualia-map coherence (qualia-richness qualia-map)))
         #f)))
+
+;; Heaviside Step Function
+(define (heaviside-step x)
+  "Heaviside step function: H(x) = 1 if x > 0, else 0."
+  (if (> x 0.0) 1.0 0.0))
+
+;; Tensor Product: A ⊗ O
+(define (tensor-product-action-observation action observation)
+  "Compute tensor product of action and observation.
+ACTION: action value (number or list)
+OBSERVATION: observation value (number or list)
+Returns (magnitude phase) of tensor product."
+  (let ((action-mag (if (number? action) (abs action) (compute-magnitude action)))
+        (obs-mag (if (number? observation) (abs observation) (compute-magnitude observation)))
+        (action-phase (if (number? action)
+                          (if (> action 0) 0.0 3.14159)
+                          0.0))
+        (obs-phase (if (number? observation)
+                       (if (> observation 0) 0.0 3.14159)
+                       0.0)))
+    (list (* action-mag obs-mag)  ; Magnitude
+          (+ action-phase obs-phase))))  ; Phase
+
+;; Helper: Compute magnitude (L2 norm)
+(define (compute-magnitude value)
+  "Compute magnitude of value (number or list)."
+  (if (number? value)
+      (abs value)
+      (if (list? value)
+          (sqrt (apply + (map (lambda (x) (* x x)) value)))
+          0.0)))
 
 ;; Qualia Richness Computation
 (define (qualia-richness qualia-map)

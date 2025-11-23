@@ -163,5 +163,66 @@ Returns list of metrics objects."
         (reverse result)
         (loop (cdr remaining) (+ i 1) (cons (car remaining) result)))))
 
+;; Self-Awareness Metrics
+;; Based on Phase 4.4: Enhance Metrics with Self-Awareness
+
+;; Note: self-monitoring.scm and reflection.scm are loaded when needed
+;; to avoid circular dependencies
+
+;; Self-Awareness Index
+(define (self-awareness-index current-state)
+  "Measure degree of self-awareness.
+CURRENT-STATE: current consciousness state
+Returns self-awareness index (0-1).
+Higher values indicate greater self-awareness."
+  (let* ((monitoring (monitor-own-state current-state))
+         (awareness (assoc-ref monitoring 'self-awareness))
+         (anomalies (assoc-ref monitoring 'anomalies))
+         (anomaly-penalty (* (length anomalies) 0.1))
+         (base-awareness (if (number? awareness) awareness 0.5))
+         (final-awareness (max 0.0 (min 1.0 (- base-awareness anomaly-penalty)))))
+    final-awareness))
+
+;; Reflection Depth
+(define (reflection-depth)
+  "Measure depth of self-reflection.
+Returns reflection depth (0-1).
+Based on number and quality of reflections."
+  (load "reflection.scm")
+  (let* ((reflection-history (if (defined? '*reflection-history*)
+                                 *reflection-history*
+                                 '()))
+         (reflection-count (length reflection-history))
+         (avg-quality (if (> reflection-count 0)
+                        (let ((qualities (map (lambda (r) (assoc-ref r 'quality)) reflection-history)))
+                          (/ (apply + qualities) reflection-count))
+                        0.0))
+         (depth (* avg-quality (min 1.0 (/ reflection-count 10.0)))))  ; Normalize by 10 reflections
+    depth))
+
+;; Self-Model Accuracy
+(define (self-model-accuracy)
+  "Measure accuracy of self-model.
+Returns accuracy (0-1).
+Compares self-predictions with actual outcomes."
+  ;; Placeholder: would compute from prediction/outcome comparison
+  ;; In real implementation, would track predictions and compare with outcomes
+  0.7)
+
+;; Enhanced CQM with Self-Awareness
+(define (compute-cqm-with-awareness metrics weights current-state)
+  "Compute overall Consciousness Quality Metric including self-awareness.
+METRICS: consciousness metrics object
+WEIGHTS: alist of (metric-name . weight)
+CURRENT-STATE: current consciousness state
+Returns enhanced CQM value."
+  (let* ((base-cqm (compute-cqm metrics weights))
+         (self-awareness (self-awareness-index current-state))
+         (reflection (reflection-depth))
+         (self-model (self-model-accuracy))
+         (awareness-component (/ (+ self-awareness reflection self-model) 3.0))
+         (enhanced-cqm (+ (* base-cqm 0.7) (* awareness-component 0.3))))  ; 70% base, 30% awareness
+    enhanced-cqm))
+
 ;; Functions are exported by default in R5RS
 

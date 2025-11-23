@@ -1,0 +1,4 @@
+[submodule "automaton-evolutions"]
+	path = automaton-evolutions
+	url = https://github.com/bthornemail/automaton-evolutions
+    branch = meta-log

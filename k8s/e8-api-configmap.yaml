@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: e8-api-config
+  namespace: meta-log
+data:
+  E8_API_HOST: "0.0.0.0"
+  E8_API_PORT: "8000"
+  E8_MAX_NORM: "20"
+  WEYL_ORBIT_MAX_SIZE: "100"
+  SHORTEST_PATH_MAX_STEPS: "48"
+  CORS_ORIGINS: "*"
+

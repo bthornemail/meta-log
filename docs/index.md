@@ -34,6 +34,16 @@ meta-log provides a complete Emacs Lisp package that abstracts Prolog/Datalog/R5
 - **R5RS Integration**: Execute R5RS Scheme code via Geiser
 - **automaton-evolutions Integration**: Load automata from CanvasL files
 
+### Meta-Log Substrate System (MLSS)
+
+- **Substrate Runtime**: Universal memory and content addressing system
+- **Binary Layer**: Canonical Binary Substrate (CBS) format and transformations
+- **Waveform Synthesis**: Waveform Description Language (WDL) and signal processing
+- **Q* Optimality Engine**: Optimality-driven decision making with multi-domain costs
+- **Computer Vision**: Image processing, feature extraction, and recognition pipeline
+- **Consciousness Framework**: Trinary consciousness states, qualia emergence, and metrics
+- **Computational Physics**: Quantum states, General Relativity from E8, and Quantum Field Theory
+
 ### Optional Features (Require Separately)
 
 - **Federation**: Peer-to-peer synchronization and coordination
@@ -102,6 +112,7 @@ M-x package-install-file RET /path/to/meta-log RET
 - [API Reference](API_REFERENCE) - Function and macro reference
 
 ### Guides
+- [MLSS Guide](MLSS_GUIDE) - Meta-Log Substrate System documentation
 - [Federation Guide](FEDERATION_GUIDE) - Distributed system setup
 - [Crypto Guide](CRYPTO_GUIDE) - Cryptographic identity management
 - [Template Discovery](TEMPLATE-DISCOVERY-BRIDGE) - Dynamic template system

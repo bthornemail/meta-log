@@ -71,6 +71,21 @@ These modules are loaded automatically when you `(require 'meta-log)`:
 - Integration with automaton-evolutions
 - **Dependencies**: npm (optional, for automaton-evolutions package)
 
+### meta-log-substrate (MLSS)
+- Meta-Log Substrate System - Universal computational substrate
+- R5RS Scheme implementation of substrate protocols
+- **Dependencies**: Guile 3.0+ (for R5RS execution)
+- **See**: [MLSS Guide](MLSS_GUIDE) for complete documentation
+
+**MLSS Modules**:
+- Substrate Runtime: Memory objects, content addressing, provenance
+- Binary Layer: CBS format, binary transformations
+- Waveform Layer: Waveform synthesis, WDL parser
+- Q* Engine: Optimality-driven decision making
+- Computer Vision: Image processing, feature extraction
+- Consciousness Framework: Conscious states, qualia, metrics
+- Computational Physics: Quantum states, GR, QFT
+
 ---
 
 ## Optional Modules (Require Separately)
@@ -705,3 +720,5 @@ If you get "Cannot open load file: No such file or directory, meta-log-MODULE":
 - [E8 Theta Series](E8_THETA_SERIES.md) - E8 theta series and QQF analysis
 - [E8 Benchmarks](E8_BENCHMARKS.md) - Performance benchmarks
 - [E8 Demo Log](E8_DEMO_LOG.md) - Proof of concept demonstration
+- [MLSS Guide](MLSS_GUIDE.md) - Meta-Log Substrate System documentation
+- [MLSS Quick Reference](MLSS_QUICK_REFERENCE.md) - MLSS quick reference card

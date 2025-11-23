@@ -51,6 +51,10 @@ navigation:
     url: /API_REFERENCE
   - title: Guides
     children:
+      - title: MLSS Guide
+        url: /MLSS_GUIDE
+      - title: MLSS Quick Reference
+        url: /MLSS_QUICK_REFERENCE
       - title: Federation Guide
         url: /FEDERATION_GUIDE
       - title: Crypto Guide

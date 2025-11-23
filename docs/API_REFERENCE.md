@@ -260,3 +260,85 @@ Predict election quorum stability using theta series.
 
 **Returns**: Plist with :stability-score, :qqf-determinant, :theta-growth, :form-type
 
+---
+
+## MLSS API Reference
+
+The Meta-Log Substrate System (MLSS) provides a comprehensive R5RS Scheme API. See [MLSS Guide](MLSS_GUIDE) for detailed documentation.
+
+### Substrate Runtime API
+
+#### `substrate-create-memory`
+Create a memory object with content addressing.
+
+**Signature**: `(substrate-create-memory data meta)`
+
+**Returns**: `(memory-object uri)`
+
+#### `substrate-get-memory`
+Retrieve memory object by URI or ID.
+
+**Signature**: `(substrate-get-memory uri-or-id)`
+
+### Binary Layer API
+
+#### `make-cbs`
+Create Canonical Binary Substrate object.
+
+**Signature**: `(make-cbs bytes meta)`
+
+#### `binary-xor`
+Apply XOR transformation to CBS.
+
+**Signature**: `(binary-xor cbs mask)`
+
+### Waveform API
+
+#### `make-waveform`
+Create waveform object.
+
+**Signature**: `(make-waveform samples meta sample-rate)`
+
+#### `wdl-compile`
+Compile WDL specification to waveform.
+
+**Signature**: `(wdl-compile ast)`
+
+### Q* API
+
+#### `make-qstar-state`
+Create Q* state representation.
+
+**Signature**: `(make-qstar-state state-vars goal-vars)`
+
+#### `qstar-evaluate`
+Evaluate Q-value for state-action pair.
+
+**Signature**: `(qstar-evaluate state action)`
+
+### Consciousness API
+
+#### `make-conscious-state`
+Create trinary consciousness state.
+
+**Signature**: `(make-conscious-state action observation phase)`
+
+#### `emerge-qualia`
+Compute qualia emergence from conscious state.
+
+**Signature**: `(emerge-qualia action observation phase threshold)`
+
+### Physics API
+
+#### `make-quantum-state`
+Create quantum state representation.
+
+**Signature**: `(make-quantum-state qubits wavefunction)`
+
+#### `einstein-equations`
+Compute Einstein field equations from energy-momentum tensor.
+
+**Signature**: `(einstein-equations energy-momentum)`
+
+For complete MLSS API documentation, see the Scheme module files in `scheme/` directory and the [MLSS Guide](MLSS_GUIDE).
+

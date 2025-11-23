@@ -108,6 +108,34 @@ Federated knowledge sharing across team members with different expertise.
 
 ---
 
+### 5. Mathematical Modules (`05-mathematical-modules.el`)
+**Use Case:** Mathematical foundations and geometric computations
+
+Demonstrates the mathematical modules integrated into meta-log for advanced computations.
+
+**What it demonstrates:**
+- Quadratic Forms (Binary, Ternary, Quaternary)
+- Quaternion Algebra operations
+- p-Adic arithmetic and valuations
+- Geometric alignments (Deltoids, Astroids, Epicycloids)
+- Drinfeld modules and exponential maps
+- Shimura curves and p-adic uniformization
+- Integration with consensus, crypto, and ML systems
+
+**How to run:**
+```elisp
+(load-file "demos/05-mathematical-modules.el")
+(demo-math-full)
+```
+
+**Best for:**
+- Mathematicians and researchers
+- Cryptography developers
+- ML engineers working with advanced features
+- Anyone interested in the mathematical foundations
+
+---
+
 ## Quick Start
 
 ### Run All Demos
@@ -133,16 +161,21 @@ emacs -l demos/01-personal-knowledge-base.el
 
 ## Demo Features Summary
 
-| Feature | KB | Research | Code | Team |
-|---------|----|---------:|------|------|
-| Knowledge Graph | ✓ | ✓ | ✓ | ✓ |
-| Natural Language | ✓ | ✓ | ✓ | ✓ |
-| Learning/Adaptation | | ✓ | | ✓ |
-| File Ingestion | ✓ | ✓ | ✓ | |
-| Chat Interface | | ✓ | | |
-| Federation | | | | ✓ |
-| Code Analysis | | | ✓ | |
-| Documentation | | | ✓ | |
+| Feature | KB | Research | Code | Team | Math |
+|---------|----|---------:|------|------|------|
+| Knowledge Graph | ✓ | ✓ | ✓ | ✓ | |
+| Natural Language | ✓ | ✓ | ✓ | ✓ | |
+| Learning/Adaptation | | ✓ | | ✓ | |
+| File Ingestion | ✓ | ✓ | ✓ | | |
+| Chat Interface | | ✓ | | | |
+| Federation | | | | ✓ | |
+| Code Analysis | | | ✓ | | |
+| Documentation | | | ✓ | | |
+| Quadratic Forms | | | | | ✓ |
+| Quaternion Algebra | | | | | ✓ |
+| p-Adic Arithmetic | | | | | ✓ |
+| Geometric Alignments | | | | | ✓ |
+| Drinfeld Modules | | | | | ✓ |
 
 ---
 

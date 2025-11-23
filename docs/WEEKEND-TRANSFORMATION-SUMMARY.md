@@ -161,7 +161,7 @@ meta-log: "I found these notes about machine learning: ..."
 ```
 meta-log/
 ├── install.sh                     # One-command installer
-├── test-install.sh                # Installation verification
+├── tests/test-install.sh         # Installation verification
 ├── QUICKSTART.md                  # 5-minute guide
 ├── meta-log-setup.el              # Setup wizard (3-step)
 ├── meta-log-dashboard.el          # Visual dashboard

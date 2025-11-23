@@ -29,7 +29,7 @@ mosquitto_pub -h localhost -p 1883 -t test/topic -m "test"
 
 # Run federation tests
 cd meta-log
-./test-federation.sh
+./tests/test-federation.sh
 ```
 
 ### Docker

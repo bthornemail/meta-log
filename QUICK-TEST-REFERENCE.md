@@ -39,7 +39,7 @@ emacs -l demos/04-team-collaboration.el
 
 ## Known Issues
 
-See [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for:
+See [dev-docs/KNOWN_ISSUES.md](dev-docs/KNOWN_ISSUES.md) for:
 - ECDSA signature bug (P0)
 - Prolog query bug (P0)
 - Datalog variable bug (P0)
@@ -65,6 +65,6 @@ See [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for:
 
 - [tests/README.md](tests/README.md) - Complete test documentation
 - [demos/README.md](demos/README.md) - Complete demo documentation
-- [TESTING-AND-DEMOS.md](TESTING-AND-DEMOS.md) - Master guide
-- [KNOWN_ISSUES.md](KNOWN_ISSUES.md) - Bug tracking
-- [TEST-SUITE-SUMMARY.md](TEST-SUITE-SUMMARY.md) - Implementation summary
+- [dev-docs/TESTING-AND-DEMOS.md](dev-docs/TESTING-AND-DEMOS.md) - Master guide
+- [dev-docs/KNOWN_ISSUES.md](dev-docs/KNOWN_ISSUES.md) - Bug tracking
+- [dev-docs/TEST-SUITE-SUMMARY.md](dev-docs/TEST-SUITE-SUMMARY.md) - Implementation summary

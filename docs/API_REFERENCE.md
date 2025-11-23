@@ -191,3 +191,154 @@ Find automaton-evolutions installation.
 
 **Returns**: Path to package or nil
 
+## E8 Lattice Functions
+
+### `meta-log-e8-bip32-to-e8` (function)
+
+Map BIP32 path to E8 lattice point.
+
+**Signature**: `(meta-log-e8-bip32-to-e8 path)`
+
+**Arguments**:
+- `path` (string): BIP32 derivation path, e.g., `"m/44'/0'/0'/0/0"`
+
+**Returns**: E8Point structure with coords, bip32-path, depth
+
+**Example**:
+```elisp
+(require 'meta-log-e8)
+(let ((point (meta-log-e8-bip32-to-e8 "m/44'/0'/0'/0/0")))
+  (message "E8 coords: %s" (meta-log-e8-point-coords point)))
+```
+
+### `meta-log-e8-verify-frbac-delegation` (function)
+
+Verify FRBAC delegation using E8 automorphisms.
+
+**Signature**: `(meta-log-e8-verify-frbac-delegation master delegate)`
+
+**Arguments**:
+- `master` (E8Point): Master key point
+- `delegate` (E8Point): Delegate key point
+
+**Returns**: Boolean indicating if delegation is valid
+
+### `meta-log-e8-distance-for-ml` (function)
+
+Compute E8 distance metrics for ML features.
+
+**Signature**: `(meta-log-e8-distance-for-ml point1 point2)`
+
+**Returns**: Plist with :euclidean, :geodesic, :padic-2, :padic-3, :weyl-distance
+
+## E8 Theta Series Functions
+
+### `meta-log-e8-theta-coefficient` (function)
+
+Get r_E8(n): theta series coefficient.
+
+**Signature**: `(meta-log-e8-theta-coefficient theta-series n)`
+
+**Arguments**:
+- `theta-series` (E8ThetaSeries): Theta series instance
+- `n` (integer): Coefficient index
+
+**Returns**: Integer coefficient value
+
+**Example**:
+```elisp
+(require 'meta-log-e8-theta)
+(let ((theta (meta-log-e8-theta-series-create 10)))
+  (meta-log-e8-theta-coefficient theta 1))  ; Returns 240
+```
+
+### `meta-log-e8-theta-predict-quorum-stability` (function)
+
+Predict election quorum stability using theta series.
+
+**Signature**: `(meta-log-e8-theta-predict-quorum-stability theta-series voter-features)`
+
+**Returns**: Plist with :stability-score, :qqf-determinant, :theta-growth, :form-type
+
+---
+
+## MLSS API Reference
+
+The Meta-Log Substrate System (MLSS) provides a comprehensive R5RS Scheme API. See [MLSS Guide](MLSS_GUIDE) for detailed documentation.
+
+### Substrate Runtime API
+
+#### `substrate-create-memory`
+Create a memory object with content addressing.
+
+**Signature**: `(substrate-create-memory data meta)`
+
+**Returns**: `(memory-object uri)`
+
+#### `substrate-get-memory`
+Retrieve memory object by URI or ID.
+
+**Signature**: `(substrate-get-memory uri-or-id)`
+
+### Binary Layer API
+
+#### `make-cbs`
+Create Canonical Binary Substrate object.
+
+**Signature**: `(make-cbs bytes meta)`
+
+#### `binary-xor`
+Apply XOR transformation to CBS.
+
+**Signature**: `(binary-xor cbs mask)`
+
+### Waveform API
+
+#### `make-waveform`
+Create waveform object.
+
+**Signature**: `(make-waveform samples meta sample-rate)`
+
+#### `wdl-compile`
+Compile WDL specification to waveform.
+
+**Signature**: `(wdl-compile ast)`
+
+### Q* API
+
+#### `make-qstar-state`
+Create Q* state representation.
+
+**Signature**: `(make-qstar-state state-vars goal-vars)`
+
+#### `qstar-evaluate`
+Evaluate Q-value for state-action pair.
+
+**Signature**: `(qstar-evaluate state action)`
+
+### Consciousness API
+
+#### `make-conscious-state`
+Create trinary consciousness state.
+
+**Signature**: `(make-conscious-state action observation phase)`
+
+#### `emerge-qualia`
+Compute qualia emergence from conscious state.
+
+**Signature**: `(emerge-qualia action observation phase threshold)`
+
+### Physics API
+
+#### `make-quantum-state`
+Create quantum state representation.
+
+**Signature**: `(make-quantum-state qubits wavefunction)`
+
+#### `einstein-equations`
+Compute Einstein field equations from energy-momentum tensor.
+
+**Signature**: `(einstein-equations energy-momentum)`
+
+For complete MLSS API documentation, see the Scheme module files in `scheme/` directory and the [MLSS Guide](MLSS_GUIDE).
+

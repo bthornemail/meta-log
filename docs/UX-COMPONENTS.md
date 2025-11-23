@@ -7,7 +7,7 @@ This document explains the new user experience components that make meta-log acc
 ```
 meta-log/
 ├── install.sh              # One-command installer
-├── test-install.sh         # Installation verification
+├── tests/test-install.sh   # Installation verification
 ├── QUICKSTART.md           # 5-minute getting started guide
 └── UX Modules:
     ├── meta-log-setup.el      # First-time setup wizard
@@ -238,7 +238,7 @@ M-x meta-log-ingest-folder
 
 ---
 
-## 6. `test-install.sh` - Installation Verification
+## 6. `tests/test-install.sh` - Installation Verification
 
 **Purpose:** Verify installation works before the user tries it.
 
@@ -254,7 +254,7 @@ M-x meta-log-ingest-folder
 
 **Usage:**
 ```bash
-./test-install.sh
+./tests/test-install.sh
 ```
 
 **Output:**
@@ -470,7 +470,7 @@ To add new UX components:
 
 3. **Update:**
    - `QUICKSTART.md` if user-facing
-   - `test-install.sh` if testable
+   - `tests/test-install.sh` if testable
    - This document
 
 4. **Keep it simple:**

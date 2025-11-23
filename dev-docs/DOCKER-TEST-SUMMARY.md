@@ -16,8 +16,8 @@ The federation implementation has been dockerized with the following components:
 - Volume mounts for federation data persistence
 
 ### 3. Test Scripts
-- **test-federation.sh**: Standalone test script (works with or without Docker)
-- **test-federation.el**: Emacs Lisp test suite
+- **tests/test-federation.sh**: Standalone test script (works with or without Docker)
+- **tests/test-federation.el**: Emacs Lisp test suite
 - **docker-test.sh**: Docker-specific test script
 
 ### 4. Configuration Files
@@ -30,7 +30,7 @@ The federation implementation has been dockerized with the following components:
 
 ```bash
 cd meta-log
-./test-federation.sh
+./tests/test-federation.sh
 ```
 
 This will test:
@@ -99,11 +99,43 @@ docker-compose down
 - `Dockerfile`: Updated with federation dependencies
 - `docker-compose.yml`: Added MQTT broker service
 - `docker-test.sh`: Docker test script
-- `test-federation.sh`: Standalone test script
+- `tests/test-federation.sh`: Standalone test script
 - `test-federation.el`: Emacs Lisp test suite
 - `mosquitto/config/mosquitto.conf`: MQTT broker configuration
 - `.dockerignore`: Docker ignore file
 - `README-FEDERATION.md`: Federation documentation
+
+## New Capabilities (Research Integration)
+
+### Metaverse Structure
+- Geometric metaverse files in `/metaverse/` directory
+- CanvasL format with dual-pair stratification
+- Integration with automaton-evolutions package
+
+### Network Partition Detection
+- Betti number β₀ calculation for O(v) partition detection
+- Geometric decomposition under partition
+- Dual-based partition recovery
+
+### UTCT Framework
+- Universal Tuple Cryptographic Transform (4-tuple state)
+- Branch cut resolution for multi-valued functions
+- Harmony verification for mathematical consistency
+
+### Geometric Consensus
+- Four-layer architecture (Relational → Geometric → Combinatorial → Autonomous)
+- Polyhedra/polytopes mapping to normative keywords
+- Proof certificate generation
+
+### 3D Projection
+- 2D CanvasL → 3D projective space projection
+- Three.js + A-Frame integration
+- AR/VR support via WebXR
+
+### Federated RBAC
+- Geometric permission manifold
+- BIP32 HD path derivation: `m/domain/org/dept/project/individual`
+- Speck256 cryptographic verification
 
 ## Next Steps
 
@@ -126,6 +158,18 @@ docker-compose down
 4. **Test federation**:
    ```bash
    docker-compose exec meta-log emacsclient -s /tmp/emacs1000/server
+   ```
+
+5. **Test new modules**:
+   ```bash
+   # Test partition detection
+   docker-compose exec meta-log emacsclient -s /tmp/emacs1000/server -e "(meta-log-federation-detect-partition)"
+   
+   # Test geometric consensus
+   docker-compose exec meta-log emacsclient -s /tmp/emacs1000/server -e "(meta-log-geometric-must-local '(t t t t))"
+   
+   # Test UTCT
+   docker-compose exec meta-log emacsclient -s /tmp/emacs1000/server -e "(meta-log-utct-create-from-basis)"
    ```
 
 ## Troubleshooting

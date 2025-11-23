@@ -71,6 +71,21 @@ These modules are loaded automatically when you `(require 'meta-log)`:
 - Integration with automaton-evolutions
 - **Dependencies**: npm (optional, for automaton-evolutions package)
 
+### meta-log-substrate (MLSS)
+- Meta-Log Substrate System - Universal computational substrate
+- R5RS Scheme implementation of substrate protocols
+- **Dependencies**: Guile 3.0+ (for R5RS execution)
+- **See**: [MLSS Guide](MLSS_GUIDE) for complete documentation
+
+**MLSS Modules**:
+- Substrate Runtime: Memory objects, content addressing, provenance
+- Binary Layer: CBS format, binary transformations
+- Waveform Layer: Waveform synthesis, WDL parser
+- Q* Engine: Optimality-driven decision making
+- Computer Vision: Image processing, feature extraction
+- Consciousness Framework: Conscious states, qualia, metrics
+- Computational Physics: Quantum states, GR, QFT
+
 ---
 
 ## Optional Modules (Require Separately)
@@ -325,6 +340,8 @@ These modules are loaded automatically when you `(require 'meta-log)`:
 - Topological agreement
 - Dimensional consensus
 - Shape-based voting
+- Polyhedral thresholds
+- Proof certificate generation
 
 **Dependencies**:
 - meta-log-federation (for multi-peer consensus)
@@ -336,6 +353,135 @@ These modules are loaded automatically when you `(require 'meta-log)`:
 ```
 
 **External Dependencies**: None
+
+**Documentation**: See [Geometric Consensus](../GEOMETRIC_CONSENSUS.md) for complete details.
+
+---
+
+#### meta-log-utct
+**Purpose**: Universal Tuple Cryptographic Transform framework
+
+**Features**:
+- Unified state machine (T_{n+1} = T_n + ΔT)
+- Branch cut resolution
+- Harmony verification
+- State delta compression
+
+**Dependencies**:
+- None (pure Elisp implementation)
+
+**Usage**:
+```elisp
+(require 'meta-log-utct)
+(meta-log-utct-apply-transformation state delta)
+```
+
+**External Dependencies**: None
+
+**Documentation**: See [UTCT Framework](../UTCT_FRAMEWORK.md) for complete details.
+
+---
+
+#### meta-log-3d-manifolds
+**Purpose**: 3D Computational Manifold Framework
+
+**Features**:
+- Polynomial type system (8-type basis)
+- M-expression to S-expression compilation
+- Evaluation trace generation
+- Cryptographic spine
+- Multi-agent intelligence
+
+**Dependencies**:
+- meta-log-r5rs (for Scheme evaluation)
+
+**Usage**:
+```elisp
+(require 'meta-log-3d-manifolds)
+(meta-log-3d-manifold-evaluate m-expression)
+```
+
+**External Dependencies**: None
+
+**Documentation**: See [3D Computational Manifolds](../3D_COMPUTATIONAL_MANIFOLDS.md) for complete details.
+
+---
+
+#### meta-log-network-partitions
+**Purpose**: Network partition handling via geometric duality
+
+**Features**:
+- Betti number partition detection (β₀)
+- Geometric decomposition
+- Dual-based recovery
+- Partition-aware consensus
+
+**Dependencies**:
+- meta-log-geometric-consensus
+
+**Usage**:
+```elisp
+(require 'meta-log-network-partitions)
+(meta-log-network-partitions-detect vertices)
+```
+
+**External Dependencies**: None
+
+**Documentation**: See [Network Partitions](../NETWORK_PARTITIONS.md) for complete details.
+
+---
+
+#### meta-log-e8
+**Purpose**: E8 exceptional Lie algebra lattice operations
+
+**Features**:
+- 240 E8 roots construction
+- BIP32 path → E8 point mapping
+- Weyl group operations (with dynamic performance-based limits)
+- p-adic heights for ramification detection
+- Shortest path algorithms (A* on E8 graph)
+- FRBAC delegation verification
+- Distance features for ML
+
+**Dependencies**:
+- meta-log-p-adic (for p-adic operations)
+
+**Usage**:
+```elisp
+(require 'meta-log-e8)
+(let ((point (meta-log-e8-bip32-to-e8 "m/44'/0'/0'/0/0")))
+  (message "E8 point: %s" (meta-log-e8-point-coords point)))
+```
+
+**External Dependencies**: None
+
+**Documentation**: See [E8 Lattice](E8_LATTICE.md) for complete details.
+
+---
+
+#### meta-log-e8-theta
+**Purpose**: E8 theta series and quaternary quadratic form analysis
+
+**Features**:
+- E8 theta series computation (weight-4 modular form)
+- Theta coefficient lookup (r_E8(n))
+- QQF linkage analysis
+- Quorum stability prediction
+- Ramanujan form detection
+
+**Dependencies**:
+- meta-log-quadratic-forms (for QQF operations)
+
+**Usage**:
+```elisp
+(require 'meta-log-e8-theta)
+(let ((theta (meta-log-e8-theta-series-create 10)))
+  (message "r_E8(1) = %d" (meta-log-e8-theta-coefficient theta 1)))
+```
+
+**External Dependencies**: None
+
+**Documentation**: See [E8 Theta Series](E8_THETA_SERIES.md) for complete details.
 
 ---
 
@@ -476,6 +622,10 @@ Core:
   meta-log
     ├── meta-log-core
     ├── meta-log-prolog
+    ├── meta-log-e8 (optional)
+    │   └── meta-log-p-adic
+    └── meta-log-e8-theta (optional)
+        └── meta-log-quadratic-forms
     ├── meta-log-datalog
     ├── meta-log-r5rs
     ├── meta-log-m-expression
@@ -529,6 +679,8 @@ Optional:
 | meta-log-automata | npm, automaton-evolutions | Optional |
 | meta-log-mqtt | Mosquitto MQTT broker | Yes (for MQTT) |
 | meta-log-webrtc | STUN/TURN server | Optional (for NAT) |
+| meta-log-e8 | None | N/A |
+| meta-log-e8-theta | None | N/A |
 | All others | None | N/A |
 
 ---
@@ -564,3 +716,9 @@ If you get "Cannot open load file: No such file or directory, meta-log-MODULE":
 - [Federation Guide](FEDERATION_GUIDE.md) - Federation setup
 - [Crypto Guide](CRYPTO_GUIDE.md) - Cryptography usage
 - [Template Discovery Bridge](TEMPLATE-DISCOVERY-BRIDGE.md) - Template system documentation
+- [E8 Lattice](E8_LATTICE.md) - E8 exceptional Lie algebra operations
+- [E8 Theta Series](E8_THETA_SERIES.md) - E8 theta series and QQF analysis
+- [E8 Benchmarks](E8_BENCHMARKS.md) - Performance benchmarks
+- [E8 Demo Log](E8_DEMO_LOG.md) - Proof of concept demonstration
+- [MLSS Guide](MLSS_GUIDE.md) - Meta-Log Substrate System documentation
+- [MLSS Quick Reference](MLSS_QUICK_REFERENCE.md) - MLSS quick reference card

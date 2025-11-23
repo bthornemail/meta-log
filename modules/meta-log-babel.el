@@ -17,6 +17,8 @@
 (require 'meta-log-prolog)
 (require 'meta-log-datalog)
 (require 'meta-log-r5rs)
+(require 'meta-log-e8)
+(require 'meta-log-e8-theta)
 
 (defun org-babel-execute:meta-log-m-expr (body params)
   "Execute meta-log-m-expr source block.
@@ -52,6 +54,20 @@ BODY is the R5RS Scheme code, PARAMS is the header arguments."
   (let ((result (meta-log-r5rs-eval body)))
     (format "%S" result)))
 
+(defun org-babel-execute:meta-log-e8 (body params)
+  "Execute meta-log-e8 source block.
+BODY is the E8 Lisp code, PARAMS is the header arguments.
+Example: (meta-log-e8-bip32-to-e8 \"m/44'/0'/0'/0/0\")"
+  (let ((result (eval (read body))))
+    (format "%S" result)))
+
+(defun org-babel-execute:meta-log-e8-theta (body params)
+  "Execute meta-log-e8-theta source block.
+BODY is the E8 Theta Series Lisp code, PARAMS is the header arguments.
+Example: (meta-log-e8-theta-coefficient 1)"
+  (let ((result (eval (read body))))
+    (format "%S" result)))
+
 (defun meta-log-datalog-format-table (results)
   "Format Datalog results as Org table."
   (if (null results)
@@ -69,6 +85,8 @@ BODY is the R5RS Scheme code, PARAMS is the header arguments."
 (add-to-list 'org-babel-load-languages '(meta-log-prolog . t))
 (add-to-list 'org-babel-load-languages '(meta-log-datalog . t))
 (add-to-list 'org-babel-load-languages '(meta-log-r5rs . t))
+(add-to-list 'org-babel-load-languages '(meta-log-e8 . t))
+(add-to-list 'org-babel-load-languages '(meta-log-e8-theta . t))
 
 (provide 'meta-log-babel)
 

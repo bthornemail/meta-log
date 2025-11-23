@@ -82,7 +82,7 @@ docker compose exec meta-log emacs --batch -l /root/.emacs.d/meta-log/test-feder
 
 ## Standalone Test Results
 
-Running `./test-federation.sh` locally (without Docker):
+Running `./tests/test-federation.sh` locally (without Docker):
 
 ```
 === Testing meta-log Federation ===

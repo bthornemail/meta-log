@@ -13,6 +13,8 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'meta-log-geometric-consensus)
+(require 'meta-log-quadratic-forms)
 
 (defun meta-log-find-evolutions-package ()
   "Find automaton-evolutions package installation.
@@ -99,6 +101,64 @@ PACKAGE-PATH is the path to the package directory."
             (meta-log-load-automaton-file file))
           (message "Loaded %d automaton file(s)" (length files)))
       (message "No automaton files found in %s" package-path))))
+
+(defun meta-log-automata-classify-geometric-type (obj)
+  "Classify automaton object by geometric type.
+OBJ is a parsed JSONL object from CanvasL.
+Returns geometric type symbol or nil."
+  (let ((dimension (cdr (assq 'dimension obj)))
+        (bipartite (cdr (assq 'bipartite obj))))
+    (when dimension
+      (cond
+       ((string-match "0D" dimension) 'point)
+       ((string-match "1D" dimension) 'line)
+       ((string-match "2D" dimension) 'triangle)
+       ((string-match "3D" dimension)
+        (let ((vertices (cdr (assq 'vertices obj)))
+              (type-str (cdr (assq 'type obj))))
+          (cond
+           ((or (eq vertices 4) (string-match "tetrahedron" (or type-str ""))) 'tetrahedron)
+           ((or (eq vertices 8) (string-match "cube" (or type-str ""))) 'cube)
+           ((or (eq vertices 6) (string-match "octahedron" (or type-str ""))) 'octahedron)
+           ((or (eq vertices 20) (string-match "dodecahedron" (or type-str ""))) 'dodecahedron)
+           ((or (eq vertices 12) (string-match "icosahedron" (or type-str ""))) 'icosahedron)
+           (t 'tetrahedron))))
+       ((string-match "4D" dimension)
+        (let ((vertices (cdr (assq 'vertices obj))))
+          (cond
+           ((eq vertices 5) 'five-cell)
+           ((eq vertices 16) 'eight-cell)
+           ((eq vertices 8) 'sixteen-cell)
+           ((eq vertices 24) 'twenty-four-cell)
+           ((eq vertices 120) 'six-hundred-cell)
+           (t 'five-cell))))
+       (t nil)))))
+
+(defun meta-log-automata-extract-geometric-consensus (obj)
+  "Extract geometric consensus requirements from automaton object.
+OBJ is a parsed JSONL object.
+Returns list of consensus criteria (boolean values) with discriminant classification."
+  (let ((bipartite (cdr (assq 'bipartite obj)))
+        (criteria '())
+        (classification nil))
+    (when bipartite
+      (let ((partition (cdr (assq 'partition bipartite)))
+            (bqf (cdr (assq 'bqf bipartite))))
+        (when (and partition bqf)
+          (let ((coefficients (cdr (assq 'coefficients bqf))))
+            (when coefficients
+              (setq criteria (mapcar (lambda (coeff) (> coeff 0)) coefficients))
+              ;; Calculate BQF discriminant and classify
+              (let ((bqf-struct (meta-log-bqf-from-coefficients coefficients)))
+                (when bqf-struct
+                  (setq classification (meta-log-bqf-classify bqf-struct))
+                  (setq criteria (append criteria
+                                        `((:discriminant . ,(meta-log-bqf-discriminant bqf-struct))
+                                          (:classification . ,classification)
+                                          (:stable . ,(member classification '(positive-definite negative-definite)))))))))))))
+    (if classification
+        (append criteria `((:bqf-classification . ,classification)))
+      criteria)))
 
 (provide 'meta-log-automata)
 

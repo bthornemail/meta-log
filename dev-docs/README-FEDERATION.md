@@ -17,7 +17,7 @@ This will start:
 
 ```bash
 # Run shell tests
-./test-federation.sh
+./tests/test-federation.sh
 
 # Or run Emacs Lisp tests
 docker-compose exec meta-log emacs --batch -l test-federation.el -f test-federation-all
@@ -76,7 +76,7 @@ The MQTT broker is configured in `mosquitto/config/mosquitto.conf`:
 
 Run the test suite:
 ```bash
-./test-federation.sh
+./tests/test-federation.sh
 ```
 
 ## Troubleshooting

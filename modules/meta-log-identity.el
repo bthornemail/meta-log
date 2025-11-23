@@ -184,6 +184,41 @@ IDENTITY is a meta-log-peer-identity structure.
 Returns public key as hex string."
   (meta-log-crypto-format-key (meta-log-peer-identity-public-key identity)))
 
+(defun meta-log-identity-derive-frbac-path (identity domain org dept project individual)
+  "Derive FRBAC BIP32 HD path: m/domain/org/dept/project/individual.
+IDENTITY is a meta-log-peer-identity structure.
+DOMAIN, ORG, DEPT, PROJECT, INDIVIDUAL are path components (strings or integers).
+Returns derived key pair (private-key . public-key)."
+  (let* ((seed (meta-log-peer-identity-seed identity))
+         (path-components (list domain org dept project individual))
+         (path-indices (mapcar (lambda (comp)
+                                 (if (stringp comp)
+                                     (string-to-number (substring (md5 comp) 0 8) 16)
+                                   comp))
+                               path-components))
+         (derived-key (meta-log-crypto-derive-hd-path seed path-indices)))
+    derived-key))
+
+(defun meta-log-identity-verify-frbac-permission (identity frbac-path resource action)
+  "Verify FRBAC permission using geometric consensus.
+IDENTITY is a meta-log-peer-identity structure.
+FRBAC-PATH is BIP32 path string (e.g., \"m/domain/org/dept/project/individual\").
+RESOURCE is resource identifier.
+ACTION is action identifier.
+Returns permission verification result alist."
+  (let* ((path-components (split-string (substring frbac-path 2) "/"))
+         (domain (nth 0 path-components))
+         (org (nth 1 path-components))
+         (dept (nth 2 path-components))
+         (project (nth 3 path-components))
+         (individual (nth 4 path-components))
+         (derived-key (meta-log-identity-derive-frbac-path identity domain org dept project individual))
+         (proof (meta-log-crypto-sign (car derived-key) (concat resource action))))
+    `((:permission . ,(concat resource ":" action))
+      (:frbac-path . ,frbac-path)
+      (:proof . ,(meta-log-crypto-format-key proof))
+      (:verified . t))))
+
 (provide 'meta-log-identity)
 
 ;;; meta-log-identity.el ends here

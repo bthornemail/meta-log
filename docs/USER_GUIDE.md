@@ -263,6 +263,31 @@ To use template discovery:
   (message "Found %d templates" (length templates)))
 ```
 
+To use E8 Lattice operations:
+
+```elisp
+(require 'meta-log)
+(require 'meta-log-e8)
+(require 'meta-log-e8-theta)
+
+(meta-log-initialize)
+
+;; Map BIP32 path to E8 point
+(let ((point (meta-log-e8-bip32-to-e8 "m/44'/0'/0'/0/0")))
+  (message "E8 coordinates: %s" (meta-log-e8-point-coords point)))
+
+;; Compute theta series coefficient
+(let ((theta (meta-log-e8-theta-series-create 10)))
+  (message "r_E8(1) = %d" (meta-log-e8-theta-coefficient theta 1)))
+  ; Returns 240
+
+;; Predict quorum stability
+(let ((theta (meta-log-e8-theta-series-create 10))
+      (features [[1.0 2.0 3.0] [2.0 3.0 4.0] [3.0 4.0 5.0]]))
+  (let ((stability (meta-log-e8-theta-predict-quorum-stability theta features)))
+    (message "Stability score: %f" (plist-get stability :stability-score))))
+```
+
 ### Complete Module Documentation
 
 For comprehensive documentation on all optional modules, their features, dependencies, and usage examples, see:

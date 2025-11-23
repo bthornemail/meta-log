@@ -22,6 +22,8 @@
 (require 'meta-log-identity)
 (require 'meta-log-mqtt)
 (require 'meta-log-webrtc)
+(require 'meta-log-partition)
+(require 'meta-log-drinfeld)
 
 (defvar meta-log-federation--initialized-p nil
   "Whether federation is initialized.")
@@ -289,6 +291,49 @@ PEER-OWNER is the peer that owns this node."
         (org-set-property "PEER_OWNER" peer-owner)
         (org-set-property "LAST_MODIFIED" (format-time-string "%Y-%m-%dT%H:%M:%SZ"))
         (save-buffer)))))
+
+(defun meta-log-federation-detect-partition ()
+  "Detect network partition using Betti number β₀.
+Returns partition info alist with :is-partitioned, :partition-count, :components."
+  (unless meta-log-federation--initialized-p
+    (user-error "Federation not initialized. Run meta-log-federation-init"))
+  (let ((vertices (hash-table-keys meta-log-federation--peers))
+        (edges '()))
+    ;; Build edge list from peer connections
+    (maphash (lambda (peer-id peer-info)
+               (let ((connections (plist-get peer-info :connections)))
+                 (dolist (conn connections)
+                   (push (cons peer-id conn) edges))))
+             meta-log-federation--peers)
+    ;; Detect partition
+    (meta-log-partition-detect vertices edges)))
+
+(defun meta-log-federation-handle-partition (partition-info)
+  "Handle network partition using geometric decomposition.
+PARTITION-INFO is partition detection result alist."
+  (let ((is-partitioned (cdr (assq :is-partitioned partition-info)))
+        (partition-count (cdr (assq :partition-count partition-info)))
+        (components (cdr (assq :components partition-info))))
+    (when is-partitioned
+      (message "Network partition detected: β₀ = %d" partition-count)
+      (dolist (component components)
+        (message "Partition component: %s" component))
+      ;; Apply geometric decomposition
+      (let ((decomposed-type (meta-log-partition-decompose 'cube partition-count)))
+        (message "Decomposed geometric type: %s" decomposed-type)))))
+
+;;; Drinfeld Module Integration for Swarm Orbits
+
+(defun meta-log-federation-swarm-orbit (agent-id time &optional drinfeld-module)
+  "Generate swarm orbit path using Drinfeld module exponential.
+AGENT-ID is the agent identifier.
+TIME is the time parameter.
+DRINFELD-MODULE is optional Drinfeld module (default: rank 2, q=2).
+Returns orbit coordinates for swarm path in A₁₁ coordination."
+  (when (featurep 'meta-log-drinfeld)
+    (let ((module (or drinfeld-module
+                     (meta-log-drinfeld-module-create 2 2))))
+      (meta-log-drinfeld-swarm-orbit module agent-id time))))
 
 (provide 'meta-log-federation)
 

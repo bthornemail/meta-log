@@ -12,7 +12,8 @@
   '(("Personal Knowledge Base" . "01-personal-knowledge-base.el")
     ("Research Assistant" . "02-research-assistant.el")
     ("Code Analysis" . "03-code-analysis.el")
-    ("Team Collaboration" . "04-team-collaboration.el"))
+    ("Team Collaboration" . "04-team-collaboration.el")
+    ("Mathematical Modules" . "05-mathematical-modules.el"))
   "List of available demos.")
 
 (defun demo-launcher-menu ()
@@ -56,6 +57,10 @@
       (insert "   Federated knowledge sharing across team members.\n")
       (insert "   Essential for distributed teams and open source.\n\n")
 
+      (insert "5. Mathematical Modules\n")
+      (insert "   Quadratic forms, quaternions, p-adic arithmetic.\n")
+      (insert "   Geometric alignments and Drinfeld modules.\n\n")
+
       (insert "═══════════════════════════════════════════════════════════\n\n")
       (insert "Enter your choice: ")
 
@@ -69,7 +74,7 @@
   (let ((choice (read-char-exclusive)))
     (cond
      ;; Individual demos
-     ((and (>= choice ?1) (<= choice ?4))
+     ((and (>= choice ?1) (<= choice ?5))
       (let* ((index (- choice ?1))
              (demo (nth index demo-list))
              (demo-file (cdr demo)))
@@ -108,7 +113,9 @@
            ((string-match "03-code" demo-file)
             (demo-code-full))
            ((string-match "04-team" demo-file)
-            (demo-collab-full)))
+            (demo-collab-full))
+           ((string-match "05-mathematical" demo-file)
+            (demo-math-full)))
 
           ;; Show completion message
           (message "")

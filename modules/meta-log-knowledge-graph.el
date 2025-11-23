@@ -203,6 +203,25 @@ Adds concepts to the knowledge graph."
         (puthash concept-id concept-node meta-log-kg--concept-index)
         (push concept-id concepts)))
 
+    ;; Extract mathematical concepts if available
+    (when (fboundp 'meta-log-kg-extract-mathematical-concepts)
+      (let ((math-concepts (meta-log-kg-extract-mathematical-concepts content)))
+        (dolist (math-concept math-concepts)
+          (let* ((concept-id (secure-hash 'sha256 (format "%s-%s"
+                                                          (meta-log-kg-node-id doc-node)
+                                                          (plist-get math-concept :name))))
+                 (concept-node (make-meta-log-kg-node
+                                :id concept-id
+                                :type 'mathematical-concept
+                                :label (plist-get math-concept :name)
+                                :properties math-concept
+                                :dimension (plist-get math-concept :dimension)
+                                :semantic-field 'mathematics
+                                :source-file (meta-log-kg-node-source-file doc-node)
+                                :related-nodes (list (meta-log-kg-node-id doc-node)))))
+            (puthash concept-id concept-node meta-log-kg--concept-index)
+            (push concept-id concepts)))))
+
     ;; Link concepts to document
     (setf (meta-log-kg-node-related-nodes doc-node) concepts)
 

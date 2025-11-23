@@ -93,14 +93,14 @@ This document lists all files created for the "regular people" UX upgrade.
 
 ## 🧪 Testing & Verification
 
-### 11. `test-install.sh` (185 lines)
+### 11. `tests/test-install.sh` (185 lines)
 **Installation verification script**
 - Tests Emacs installation
 - Verifies files present
 - Checks module loading
 - Tests dependencies
 - Generates report
-- **Usage:** `./test-install.sh`
+- **Usage:** `./tests/test-install.sh`
 
 ---
 
@@ -144,7 +144,7 @@ meta-log/
 │
 ├── 🚀 INSTALLATION & SETUP
 │   ├── install.sh              ← One-command installer
-│   ├── test-install.sh         ← Verify installation
+│   ├── tests/test-install.sh    ← Verify installation
 │   └── QUICKSTART.md           ← 5-minute guide
 │
 ├── 💻 UX COMPONENTS
@@ -171,7 +171,7 @@ meta-log/
 
 ### Installation Layer
 - **install.sh** → Get meta-log installed (3 min)
-- **test-install.sh** → Verify it worked
+- **tests/test-install.sh** → Verify it worked
 
 ### First-Run Experience
 - **meta-log-setup.el** → Configure (2 min)
@@ -277,7 +277,7 @@ Ship these files:
 
 Optional but recommended:
 ```
-⭐ test-install.sh
+⭐ tests/test-install.sh
 ⭐ docs/UX-UPGRADE-ROADMAP.md
 ⭐ docs/UX-COMPONENTS.md
 ```
@@ -286,7 +286,7 @@ Optional but recommended:
 - [ ] Fresh Ubuntu VM
 - [ ] Fresh macOS
 - [ ] Termux (Android)
-- [ ] Run test-install.sh on all 3
+- [ ] Run tests/test-install.sh on all 3
 - [ ] Fix any bugs
 - [ ] Record demo video (optional)
 
@@ -326,7 +326,7 @@ Optional but recommended:
 | Understand architecture | `UX-COMPONENTS.md` |
 | See what we built | `WEEKEND-TRANSFORMATION-SUMMARY.md` |
 | Find a specific file | This file! |
-| Test installation | `test-install.sh` |
+| Test installation | `tests/test-install.sh` |
 
 ---
 

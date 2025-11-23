@@ -34,6 +34,16 @@ meta-log provides a complete Emacs Lisp package that abstracts Prolog/Datalog/R5
 - **R5RS Integration**: Execute R5RS Scheme code via Geiser
 - **automaton-evolutions Integration**: Load automata from CanvasL files
 
+### Meta-Log Substrate System (MLSS)
+
+- **Substrate Runtime**: Universal memory and content addressing system
+- **Binary Layer**: Canonical Binary Substrate (CBS) format and transformations
+- **Waveform Synthesis**: Waveform Description Language (WDL) and signal processing
+- **Q* Optimality Engine**: Optimality-driven decision making with multi-domain costs
+- **Computer Vision**: Image processing, feature extraction, and recognition pipeline
+- **Consciousness Framework**: Trinary consciousness states, qualia emergence, and metrics
+- **Computational Physics**: Quantum states, General Relativity from E8, and Quantum Field Theory
+
 ### Optional Features (Require Separately)
 
 - **Federation**: Peer-to-peer synchronization and coordination
@@ -45,6 +55,9 @@ meta-log provides a complete Emacs Lisp package that abstracts Prolog/Datalog/R5
 - **Collective Intelligence**: Collaborative knowledge building
 - **Verifiable Computation**: Computation verification and proof checking
 - **Geometric Consensus**: Consensus algorithms based on topology
+- **UTCT Framework**: Universal Tuple Cryptographic Transform for unified state machines
+- **3D Computational Manifolds**: Visual programming environments with spatial computation
+- **Network Partition Handling**: Geometric duality for partition detection and recovery
 
 See [Modules Documentation](MODULES) for detailed documentation on all modules.
 
@@ -93,13 +106,29 @@ M-x package-install-file RET /path/to/meta-log RET
 
 ## Documentation
 
+### Getting Started
 - [User Guide](USER_GUIDE) - Getting started and basic usage
 - [Modules Documentation](MODULES) - Complete module reference
 - [API Reference](API_REFERENCE) - Function and macro reference
+
+### Guides
+- [MLSS Guide](MLSS_GUIDE) - Meta-Log Substrate System documentation
+- [MLSS Use Cases](MLSS_USE_CASES) - Real-world MLSS applications
 - [Federation Guide](FEDERATION_GUIDE) - Distributed system setup
 - [Crypto Guide](CRYPTO_GUIDE) - Cryptographic identity management
 - [Template Discovery](TEMPLATE-DISCOVERY-BRIDGE) - Dynamic template system
 - [Better than LLM](BETTER-THAN-LLM) - Why meta-log is better than an LLM
+
+### Advanced Concepts
+- [Geometric Consensus](GEOMETRIC_CONSENSUS) - Polyhedra-based consensus algorithms
+- [UTCT Framework](UTCT_FRAMEWORK) - Universal Tuple Cryptographic Transform
+- [3D Computational Manifolds](3D_COMPUTATIONAL_MANIFOLDS) - Visual programming environments
+- [Network Partitions](NETWORK_PARTITIONS) - Partition handling via geometric duality
+
+### Theory & Research
+- [Concepts](concepts/) - Detailed theoretical concepts
+- [Research](research/) - Research topics and foundations
+- [Architecture](architecture/) - System architecture documentation
 
 ## Architecture
 

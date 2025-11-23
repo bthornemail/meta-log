@@ -16,7 +16,7 @@ sudo apt install emacs
 
 ```bash
 cd meta-log
-./test-federation.sh
+./tests/test-federation.sh
 ```
 
 Expected output:

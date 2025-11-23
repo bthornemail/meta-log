@@ -113,6 +113,7 @@ M-x package-install-file RET /path/to/meta-log RET
 
 ### Guides
 - [MLSS Guide](MLSS_GUIDE) - Meta-Log Substrate System documentation
+- [MLSS Use Cases](MLSS_USE_CASES) - Real-world MLSS applications
 - [Federation Guide](FEDERATION_GUIDE) - Distributed system setup
 - [Crypto Guide](CRYPTO_GUIDE) - Cryptographic identity management
 - [Template Discovery](TEMPLATE-DISCOVERY-BRIDGE) - Dynamic template system

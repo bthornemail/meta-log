@@ -53,6 +53,8 @@ navigation:
     children:
       - title: MLSS Guide
         url: /MLSS_GUIDE
+      - title: MLSS Use Cases
+        url: /MLSS_USE_CASES
       - title: MLSS Quick Reference
         url: /MLSS_QUICK_REFERENCE
       - title: Federation Guide

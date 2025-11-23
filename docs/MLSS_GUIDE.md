@@ -275,12 +275,27 @@ MLSS integrates with meta-log through:
 ✅ **Performance Validated**
 ✅ **Documentation Complete**
 
+## Use Cases
+
+For detailed real-world use cases and applications, see [MLSS Use Cases](MLSS_USE_CASES).
+
+Common use cases include:
+- **Data Processing**: Universal format conversion, content-addressed storage
+- **Signal Processing**: Waveform synthesis, audio feature extraction
+- **Computer Vision**: Image search, multi-view geometry
+- **Optimal Decision Making**: Pathfinding, resource allocation
+- **Consciousness Research**: Conscious state simulation, learning models
+- **Computational Physics**: Quantum simulation, spacetime computation
+- **Knowledge Representation**: Symbolic fact extraction, cross-domain reasoning
+- **Distributed Systems**: Content-addressed federation, provenance tracking
+
 ## Next Steps
 
-1. Review the [Integration Specification](../dev-docs/INTEGRATION-MLSS.md)
-2. Run the [quick demo](../tests/demo-mlss-quick.sh)
-3. Explore the [verification log](../tests/VERIFICATION-LOG.md)
-4. Check [benchmark results](../tests/BENCHMARK-RESULTS.md)
+1. Review [MLSS Use Cases](MLSS_USE_CASES) for real-world applications
+2. Review the [Integration Specification](../dev-docs/INTEGRATION-MLSS.md)
+3. Run the [quick demo](../tests/demo-mlss-quick.sh)
+4. Explore the [verification log](../tests/VERIFICATION-LOG.md)
+5. Check [benchmark results](../tests/BENCHMARK-RESULTS.md)
 
 ---
 

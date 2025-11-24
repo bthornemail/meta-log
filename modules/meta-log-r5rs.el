@@ -41,11 +41,21 @@ PATH should point to r5rs-canvas-engine.scm file."
 
 (defun meta-log-r5rs-eval (expression)
   "Evaluate an R5RS Scheme EXPRESSION.
-Returns the result."
+Returns the result.
+If result is a special marker for Emacs Lisp calls, intercepts and executes."
   (unless meta-log-r5rs--engine-loaded
     (user-error "R5RS engine not loaded. Run meta-log-r5rs-load-engine"))
   (if (fboundp 'geiser-eval--send/wait)
-      (geiser-eval--send/wait expression)
+      (let ((result (geiser-eval--send/wait expression)))
+        ;; Check if result is a request to call Emacs Lisp function
+        (if (and (listp result)
+                 (eq (car result) 'emacs-lisp-call)
+                 (>= (length result) 2))
+            ;; Intercept and call the Emacs Lisp function
+            (let ((func-name (nth 1 result))
+                  (args (nthcdr 2 result)))
+              (apply (intern func-name) args))
+          result))
     (user-error "Geiser not available. Cannot evaluate R5RS expressions.")))
 
 (defun meta-log-r5rs-call (function-name &rest args)

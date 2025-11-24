@@ -100,6 +100,10 @@
 (require 'meta-log-binary-substrate nil t)
 (require 'meta-log-provenance nil t)
 
+;; Bridge for Scheme to call Prolog/Datalog and HTTP services
+(require 'meta-log-prolog-bridge nil t)
+(require 'meta-log-http-client nil t)
+
 ;;;###autoload
 (defun meta-log-initialize ()
   "Initialize the meta-log system.

@@ -9,54 +9,94 @@
 ;;; Code:
 
 ;; Prolog Interface
-;; In real implementation, this would use FFI to call Emacs Lisp functions
-;; For now, we define the interface that will be implemented
+;; Uses Geiser FFI to call Emacs Lisp functions via meta-log-prolog-bridge
+
+;; Load shared helpers
+(load "../common/helpers.scm")
+
+;; Note: call-emacs-lisp is now defined in common/helpers.scm
 
 (define (prolog-query query)
   "Execute Prolog query.
 QUERY: Prolog query as S-expression
-Returns list of solutions."
-  ;; This would call meta-log-prolog-query via FFI
-  ;; Placeholder implementation
-  (list '((?X . value1) (?Y . value2))))
+Returns list of solutions (binding sets as alists)."
+  ;; Call meta-log-bridge-prolog-query via Emacs Lisp bridge
+  ;; The marker is intercepted by meta-log-r5rs-eval which executes the function
+  (call-emacs-lisp "meta-log-bridge-prolog-query" (list query)))
 
 (define (prolog-add-fact fact)
   "Add fact to Prolog database.
-FACT: Prolog fact as S-expression
-Returns success status."
-  ;; This would call meta-log-prolog-add-fact via FFI
-  #t)
+FACT: Prolog fact as S-expression (list with predicate as first element)
+Returns success status (#t on success, #f on failure)."
+  (let ((predicate (if (and (list? fact) (not (null? fact)))
+                       (car fact)
+                       fact))
+        (args (if (and (list? fact) (> (length fact) 1))
+                  (cdr fact)
+                  '())))
+    ;; Call bridge function - result is intercepted and executed by Emacs side
+    (let ((result (call-emacs-lisp "meta-log-bridge-prolog-add-fact"
+                                   (cons predicate args))))
+      ;; Result should be the fact if successful, or nil on error
+      (if result #t #f))))
 
 (define (prolog-add-rule rule)
   "Add rule to Prolog database.
-RULE: Prolog rule as S-expression
-Returns success status."
-  ;; This would call meta-log-prolog-add-rule via FFI
-  #t)
+RULE: Prolog rule as S-expression (head . body) or list with :- separator
+Returns success status (#t on success, #f on failure)."
+  (let ((head (if (and (list? rule) (not (null? rule)))
+                  (car rule)
+                  rule))
+        (body (if (and (list? rule) (> (length rule) 1))
+                  (cdr rule)
+                  '())))
+    ;; Call bridge function - result is intercepted and executed by Emacs side
+    (let ((result (call-emacs-lisp "meta-log-bridge-prolog-add-rule"
+                                   (cons head body))))
+      ;; Result should be the rule if successful, or nil on error
+      (if result #t #f))))
 
 ;; Datalog Interface
 
 (define (datalog-query query)
   "Execute Datalog query.
 QUERY: Datalog query as S-expression
-Returns list of solutions."
-  ;; This would call meta-log-datalog-query via FFI
-  ;; Placeholder implementation
-  (list '((?X . value1) (?Y . value2))))
+Returns list of matching facts."
+  ;; Call meta-log-bridge-datalog-query via Emacs Lisp bridge
+  ;; The marker is intercepted by meta-log-r5rs-eval which executes the function
+  (call-emacs-lisp "meta-log-bridge-datalog-query" (list query)))
 
 (define (datalog-add-fact fact)
   "Add fact to Datalog database.
-FACT: Datalog fact as S-expression
-Returns success status."
-  ;; This would call meta-log-datalog-add-fact via FFI
-  #t)
+FACT: Datalog fact as S-expression (list with predicate as first element)
+Returns success status (#t on success, #f on failure)."
+  (let ((predicate (if (and (list? fact) (not (null? fact)))
+                       (car fact)
+                       fact))
+        (args (if (and (list? fact) (> (length fact) 1))
+                  (cdr fact)
+                  '())))
+    ;; Call bridge function - result is intercepted and executed by Emacs side
+    (let ((result (call-emacs-lisp "meta-log-bridge-datalog-add-fact"
+                                   (cons predicate args))))
+      ;; Result should be the fact if successful, or nil on error
+      (if result #t #f))))
 
 (define (datalog-add-rule rule)
   "Add rule to Datalog database.
-RULE: Datalog rule as S-expression
-Returns success status."
-  ;; This would call meta-log-datalog-add-rule via FFI
-  #t)
+RULE: Datalog rule as S-expression (head . body) or list with :- separator
+Returns success status (#t on success, #f on failure)."
+  (let ((head (if (and (list? rule) (not (null? rule)))
+                  (car rule)
+                  rule))
+        (body (if (and (list? rule) (> (length rule) 1))
+                  (cdr rule)
+                  '())))
+    ;; Call bridge function - result is intercepted and executed by Emacs side
+    (let ((result (call-emacs-lisp "meta-log-bridge-datalog-add-rule"
+                                   (cons head body))))
+      ;; Result should be the rule if successful, or nil on error
+      (if result #t #f))))
 
 ;; Symbolic Reasoning Integration
 

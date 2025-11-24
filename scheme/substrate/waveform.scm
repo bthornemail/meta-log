@@ -42,36 +42,156 @@ META: alist of metadata"
   "Get duration in seconds from waveform."
   (assoc-ref (list-ref waveform 2) 'duration))
 
+;; Load shared helpers
+(load "../common/helpers.scm")
+
+;; Note: Helper functions (take-every-nth, iota, real-to-complex, take, make-list)
+;; are now defined in common/helpers.scm
+
+;; Define pi constant (if not available)
+(define pi 3.141592653589793)
+
+;; Simple FFT implementation (Cooley-Tukey algorithm)
+(define (fft-recursive samples)
+  "Recursive FFT implementation (Cooley-Tukey).
+SAMPLES: list of complex numbers (or real numbers treated as complex)
+Returns list of complex numbers."
+  (let ((n (length samples)))
+    (if (<= n 1)
+        samples
+        (let* ((even (fft-recursive (take-every-nth samples 2 0)))  ; Even indices
+               (odd (fft-recursive (take-every-nth samples 2 1)))   ; Odd indices
+               (twiddle-factors (map (lambda (k)
+                                      (let ((angle (* -2.0 pi (/ k n))))
+                                        (list (cos angle) (sin angle))))  ; Complex e^(-2πik/n)
+                                    (iota n))))
+          (append (map (lambda (e o tw)
+                        (let ((tw-e-real (- (* (car e) (car tw)) (* (cadr e) (cadr tw))))
+                              (tw-e-imag (+ (* (car e) (cadr tw)) (* (cadr e) (car tw)))))
+                          (list (+ (car o) tw-e-real) (+ (cadr o) tw-e-imag))))
+                      even odd twiddle-factors)
+                  (map (lambda (e o tw)
+                        (let ((tw-e-real (- (* (car e) (car tw)) (* (cadr e) (cadr tw))))
+                              (tw-e-imag (+ (* (car e) (cadr tw)) (* (cadr e) (car tw)))))
+                          (list (- (car o) tw-e-real) (- (cadr o) tw-e-imag))))
+                      even odd twiddle-factors))))))
+
+;; Helper functions (take-every-nth, iota, real-to-complex) are in common/helpers.scm
+
 ;; Frequency domain operations (lazy computation)
 (define (waveform-compute-fft waveform)
-  "Compute FFT for waveform (placeholder - would call FastAPI service)."
-  ;; In real implementation, this would call FastAPI waveform-dsp service
-  ;; For now, return placeholder
+  "Compute FFT for waveform.
+Returns frequency domain representation with coefficients."
   (let ((samples (waveform-get-samples waveform))
         (sample-rate (waveform-get-sample-rate waveform)))
-    (list 'frequency-domain
-          '((coefficients . #f)  ; placeholder
-            (fft-size . ,(if (list? samples) (length samples) 1024))
-            (computed . #t)))))
+    (if (null? samples)
+        (list 'frequency-domain
+              '((coefficients . ())
+                (fft-size . 0)
+                (computed . #t)))
+        (let* ((complex-samples (map real-to-complex samples))
+               (fft-result (fft-recursive complex-samples))
+               (fft-size (length fft-result))
+               (magnitudes (map (lambda (c)
+                                 (sqrt (+ (* (car c) (car c))
+                                          (* (cadr c) (cadr c)))))
+                               fft-result)))
+          (list 'frequency-domain
+                `((coefficients . ,magnitudes)
+                  (fft-size . ,fft-size)
+                  (computed . #t)))))))
+
+;; p-adic valuation helper (from Q* scoring)
+(define (p-adic-valuation n p)
+  "Compute p-adic valuation v_p(n)."
+  (if (or (zero? n) (< n 0))
+      0
+      (let loop ((num (abs n))
+                 (count 0))
+        (if (or (zero? num) (not (zero? (modulo num p))))
+            count
+            (loop (quotient num p) (+ count 1))))))
 
 ;; p-adic signature computation
 (define (waveform-compute-padic-signature waveform prime depth)
-  "Compute p-adic signature for waveform."
-  ;; Placeholder implementation
-  (list 'padic-signature
-        `((prime . ,prime)
-          (depth . ,depth)
-          (valuations . #f)  ; placeholder
-          (computed . #t))))
+  "Compute p-adic signature for waveform.
+PRIME: prime number for p-adic valuation
+DEPTH: maximum depth for valuation computation
+Returns p-adic signature with valuations."
+  (let ((samples (waveform-get-samples waveform)))
+    (if (null? samples)
+        (list 'padic-signature
+              `((prime . ,prime)
+                (depth . ,depth)
+                (valuations . ())
+                (computed . #t)))
+        (let* ((sample-count (min depth (length samples)))
+               (sample-subset (take samples sample-count))
+               (valuations (map (lambda (s)
+                                (let ((sample-int (round (abs s))))
+                                  (p-adic-valuation sample-int prime)))
+                              sample-subset)))
+          (list 'padic-signature
+                `((prime . ,prime)
+                  (depth . ,depth)
+                  (valuations . ,valuations)
+                  (computed . #t)))))))
+
+(define (take list n)
+  "Take first N elements from list."
+  (if (or (null? list) (<= n 0))
+      '()
+      (cons (car list) (take (cdr list) (- n 1)))))
 
 ;; E8 signature computation
 (define (waveform-compute-e8-signature waveform)
-  "Compute E8 harmonic signature for waveform."
-  ;; Placeholder implementation
-  (list 'e8-signature
-        `((harmonic-projection . ,(make-list 8 0.0))  ; placeholder 8D vector
-          (symmetry-class . 0)
-          (computed . #t))))
+  "Compute E8 harmonic signature for waveform.
+Projects frequency domain coefficients to 8D E8 space.
+Returns E8 signature with harmonic projection."
+  (let ((freq-domain (waveform-compute-fft waveform))
+        (coefficients (assoc-ref (list-ref freq-domain 1) 'coefficients)))
+    (if (null? coefficients)
+        (list 'e8-signature
+              `((harmonic-projection . ,(make-list 8 0.0))
+                (symmetry-class . 0)
+                (computed . #t)))
+        (let* ((coeff-count (length coefficients))
+               (coeff-sum (apply + coefficients))
+               (coeff-mean (if (zero? coeff-count) 0.0 (/ coeff-sum coeff-count)))
+               ;; Project to 8D: use first 8 coefficients or pad/truncate
+               (projection (let loop ((coeffs coefficients)
+                                     (result '())
+                                     (i 0))
+                            (if (>= i 8)
+                                (reverse result)
+                                (if (null? coeffs)
+                                    (loop '() (cons 0.0 result) (+ i 1))
+                                    (loop (cdr coeffs) (cons (car coeffs) result) (+ i 1))))))
+               ;; Normalize projection
+               (norm (sqrt (apply + (map (lambda (x) (* x x)) projection))))
+               (normalized (if (zero? norm)
+                              projection
+                              (map (lambda (x) (/ x norm)) projection)))
+               ;; Compute symmetry class (simplified: based on coefficient distribution)
+               (symmetry-class (if (zero? coeff-count)
+                                  0
+                                  (let ((variance (/ (apply + (map (lambda (x)
+                                                                    (let ((diff (- x coeff-mean)))
+                                                                      (* diff diff)))
+                                                                  coefficients))
+                                                    coeff-count)))
+                                    (round (* 10 variance))))))
+          (list 'e8-signature
+                `((harmonic-projection . ,normalized)
+                  (symmetry-class . ,symmetry-class)
+                  (computed . #t))))))
+
+(define (make-list n value)
+  "Create list of N copies of VALUE."
+  (let loop ((i 0) (result '()))
+    (if (>= i n)
+        (reverse result)
+        (loop (+ i 1) (cons value result)))))
 
 ;; Waveform creation from samples
 (define (waveform-create samples sample-rate duration channels)

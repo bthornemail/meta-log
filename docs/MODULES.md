@@ -71,6 +71,19 @@ These modules are loaded automatically when you `(require 'meta-log)`:
 - Integration with automaton-evolutions
 - **Dependencies**: npm (optional, for automaton-evolutions package)
 
+---
+
+## Related Packages
+
+### meta-log-db (TypeScript/JavaScript)
+
+A separate TypeScript implementation providing similar database functionality:
+
+- **Installation**: `npm install meta-log-db` or use dev version at `/home/main/meta-log-db`
+- **Features**: Prolog, Datalog, R5RS, SPARQL, SHACL, E8 Lattice operations
+- **Use Case**: Browser/Node.js environments, OpenCode/Obsidian plugins
+- **Relationship**: Complementary implementation - can be used alongside or instead of Emacs Lisp version
+
 ### meta-log-substrate (MLSS)
 - Meta-Log Substrate System - Universal computational substrate
 - R5RS Scheme implementation of substrate protocols

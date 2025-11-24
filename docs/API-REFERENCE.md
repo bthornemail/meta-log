@@ -263,6 +263,8 @@ Extract template from Org heading.
 
 Extract facts from Org AST.
 
+**Status**: ⚠️ **Partial** - Structure exists, implementation may be incomplete.
+
 **Signature**: `(meta-log-org-extract-facts ast)`
 
 ---
@@ -291,6 +293,13 @@ Find automaton-evolutions installation.
 ---
 
 ## MLSS API
+
+**Implementation Status Indicators**:
+- ✅ **Complete** - Fully implemented and functional
+- ⚠️ **Partial** - Core structure implemented, some functions have placeholder implementations
+- ❌ **Placeholder** - Function exists but returns placeholder values
+
+**Note**: Some MLSS APIs have placeholder implementations that need completion. See [AUDIT-REPORT.md](AUDIT-REPORT.md) and [API-VERIFICATION.md](API-VERIFICATION.md) for detailed status.
 
 ### Substrate Runtime
 
@@ -349,6 +358,8 @@ Create a waveform object.
 
 Compile Waveform Description Language to waveform.
 
+**Status**: ⚠️ **Partial** - Core structure implemented, some waveform computation functions (FFT, p-adic, E8 signatures) have placeholder implementations.
+
 **Signature**: `(wdl-compile wdl-expression)`
 
 **Example**:
@@ -368,6 +379,8 @@ Create a Q* state object.
 
 Evaluate action in Q* state.
 
+**Status**: ⚠️ **Partial** - Structure implemented, but scoring functions (qstar-score-euclidean, qstar-score-weyl, etc.) return placeholder values (0.0).
+
 **Signature**: `(qstar-evaluate state action)`
 
 **Returns**: `(value plan provenance)`
@@ -375,6 +388,8 @@ Evaluate action in Q* state.
 #### `qstar-select-action`
 
 Select optimal action from action space.
+
+**Status**: ⚠️ **Partial** - Structure implemented, depends on qstar-evaluate scoring functions.
 
 **Signature**: `(qstar-select-action state action-space)`
 
@@ -395,6 +410,8 @@ Convert image to CBS format.
 #### `extract-features`
 
 Extract features from image.
+
+**Status**: ⚠️ **Partial** - Basic implementation exists, but FastAPI vision service functions (extract-sift, extract-orb, match-features-api) are placeholders that raise errors.
 
 **Signature**: `(extract-features image)`
 

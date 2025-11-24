@@ -379,6 +379,8 @@ MIT
 
 - **automaton-evolutions**: Canonical automaton CanvasL data files
 - **meta-log-db**: TypeScript database package (separate implementation)
+  - Install from npm: `npm install meta-log-db`
+  - Dev version available at: `/home/main/meta-log-db` (for local development)
 
 ## Documentation
 

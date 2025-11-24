@@ -114,14 +114,21 @@ Returns distance (Euclidean for now)."
     (sqrt (+ (* (- x1 x2) (- x1 x2))
              (* (- y1 y2) (- y1 y2))))))
 
-;; FastAPI Service Interface (Placeholder)
+;; FastAPI Service Interface
+;; Uses bridge mechanism to call Emacs Lisp HTTP client
+
+;; Load shared helpers
+(load "../common/helpers.scm")
+
+;; Note: call-emacs-lisp is now defined in common/helpers.scm
+
 (define (call-vision-api endpoint data)
   "Call FastAPI vision service.
-ENDPOINT: API endpoint path
-DATA: request data
-Returns response data."
-  ;; Placeholder - would use HTTP client to call FastAPI
-  (error "FastAPI vision service not yet implemented"))
+ENDPOINT: API endpoint path (string)
+DATA: request data (alist)
+Returns response data (alist)."
+  ;; Call bridge function - result is intercepted and executed by Emacs side
+  (call-emacs-lisp "meta-log-bridge-call-vision-api" (list endpoint data)))
 
 (define (extract-sift image-uri)
   "Extract SIFT features via FastAPI service.

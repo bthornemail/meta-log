@@ -712,7 +712,7 @@ If you get "Cannot open load file: No such file or directory, meta-log-MODULE":
 ## See Also
 
 - [User Guide](USER_GUIDE.md) - General usage guide
-- [API Reference](API_REFERENCE.md) - API documentation
+- [API Reference](API-REFERENCE.md) - API documentation
 - [Federation Guide](FEDERATION_GUIDE.md) - Federation setup
 - [Crypto Guide](CRYPTO_GUIDE.md) - Cryptography usage
 - [Template Discovery Bridge](TEMPLATE-DISCOVERY-BRIDGE.md) - Template system documentation

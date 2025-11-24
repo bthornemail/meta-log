@@ -252,5 +252,5 @@ For web applications:
 
 ---
 
-**Want technical details?** See [MLSS Guide](MLSS_GUIDE) or [API Reference](API_REFERENCE) for implementation specifics.
+**Want technical details?** See [MLSS Guide](MLSS_GUIDE) or [API Reference](API-REFERENCE) for implementation specifics.
 

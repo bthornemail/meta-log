@@ -46,7 +46,7 @@ docs/
 ├── index.md                 # Homepage
 ├── USER_GUIDE.md           # User guide
 ├── MODULES.md              # Module documentation
-├── API_REFERENCE.md        # API reference
+├── API-REFERENCE.md        # API reference
 ├── FEDERATION_GUIDE.md     # Federation setup guide
 ├── CRYPTO_GUIDE.md         # Cryptography guide
 ├── PROTOCOL_HANDLERS.md    # Protocol handlers

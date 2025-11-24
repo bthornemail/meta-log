@@ -62,7 +62,10 @@ navigation:
   - title: Modules
     url: /MODULES
   - title: API Reference
-    url: /API_REFERENCE
+    url: /API-REFERENCE
+    nav_order: 4
+  - title: Glossary
+    url: /GLOSSARY
   - title: Guides
     children:
       - title: MLSS Guide

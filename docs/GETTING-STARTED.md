@@ -208,7 +208,7 @@ You should see:
 
 - [MLSS Guide](MLSS_GUIDE) - Complete technical guide
 - [MLSS Use Cases](MLSS_USE_CASES) - Real-world examples
-- [API Reference](API_REFERENCE) - Function documentation
+- [API Reference](API-REFERENCE) - Function documentation
 
 ### Learn the Architecture
 

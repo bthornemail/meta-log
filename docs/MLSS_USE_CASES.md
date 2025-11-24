@@ -615,6 +615,6 @@ These use cases demonstrate that MLSS provides:
 **See Also**:
 - [MLSS Guide](MLSS_GUIDE) - Complete MLSS documentation
 - [MLSS Quick Reference](MLSS_QUICK_REFERENCE) - Quick syntax reference
-- [API Reference](API_REFERENCE) - Complete API documentation
+- [API Reference](API-REFERENCE) - Complete API documentation
 
 

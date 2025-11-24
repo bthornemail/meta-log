@@ -39,21 +39,54 @@ meta-log is an intelligent knowledge management system that combines:
 - **R5RS Integration**: Execute R5RS Scheme code via Geiser
 - **automaton-evolutions Integration**: Load automata from CanvasL files
 
+### Meta-Log Substrate System (MLSS)
+
+The MLSS provides a universal computational substrate with six integrated phases:
+
+- **Foundation**: Substrate runtime, binary layer (CBS), provenance chains, content addressing
+- **Waveform & Geometric**: Waveform synthesis, WDL parser, E8 projections, cross-domain mappings
+- **Q* Optimality Engine**: Optimality-driven decision making with multi-domain cost functions
+- **Computer Vision**: Image processing, feature extraction, recognition pipeline
+- **Consciousness Framework**: Trinary consciousness states, qualia emergence, awareness metrics
+- **Computational Physics**: Quantum states, General Relativity from E8, Quantum Field Theory
+
+**Key Capabilities**:
+- 🔄 **Universal Data Format**: One system for all data types (binary, audio, images, symbolic)
+- 🤖 **Autonomous Behavior**: Perceive → decide → act → learn cycles
+- 🧠 **Self-Awareness**: Self-monitoring, reflection, and recognition
+- 📦 **Content Addressing**: Automatic deduplication via mlss:// URIs
+- 🎯 **Optimal Decisions**: Q* engine for multi-domain optimization
+- 🔬 **Consciousness Framework**: Testable models of awareness and qualia
+
+See [docs/MLSS_GUIDE.md](docs/MLSS_GUIDE.md) for complete MLSS documentation.
+
 ### Optional Features (Require Separately)
 
+**Federation & Networking**:
 - **Federation**: Peer-to-peer synchronization and coordination
-- **Cryptography**: BIP32/39/44 key derivation and identity management
 - **MQTT**: Pub/sub messaging for distributed systems
 - **WebRTC**: Direct peer connections with TCP fallback
+- **Identity Management**: Peer identity and authentication
+
+**Cryptography & Security**:
+- **Cryptography**: BIP32/39/44 key derivation and identity management
+- **Federated RBAC**: Geometric permission manifold with BIP32 HD path derivation
+- **Verifiable Computation**: Computation verification and proof checking
+
+**Template System**:
 - **Template Discovery**: Dynamic template discovery with semantic matching
 - **Template Federation**: Share templates across federated peers
+- **WordNet Integration**: Semantic analysis for template matching
+
+**Advanced Features**:
 - **Collective Intelligence**: Collaborative knowledge building
-- **Verifiable Computation**: Computation verification and proof checking
 - **Geometric Consensus**: Consensus algorithms based on topology
 - **Network Partition Detection**: Betti number-based partition detection (O(v) complexity)
 - **UTCT Framework**: Universal Tuple Cryptographic Transform for state management
 - **3D Projection**: 2D CanvasL to 3D projective space projection with AR/VR support
-- **Federated RBAC**: Geometric permission manifold with BIP32 HD path derivation
+- **E8 Lattice Operations**: E8 geometric computation and theta series
+- **Canvas API**: CanvasL protocol handlers and integration
+- **Server Coordination**: Emacs server coordination for distributed systems
 
 ### Metaverse Structure
 
@@ -303,14 +336,37 @@ meta-log uses a modular architecture to minimize dependencies:
 (require 'meta-log-federation)
 (require 'meta-log-mqtt)
 (require 'meta-log-webrtc)
+(require 'meta-log-identity)
+
+;; For cryptography:
+(require 'meta-log-crypto)
 
 ;; For template discovery:
 (require 'meta-log-template-discovery)
 (require 'meta-log-wordnet)
+(require 'meta-log-template-federation)
 
 ;; For advanced features:
 (require 'meta-log-collective-intelligence)
 (require 'meta-log-verifiable-computation)
+(require 'meta-log-geometric-consensus)
+(require 'meta-log-partition)
+(require 'meta-log-utct)
+(require 'meta-log-3d-projection)
+
+;; For E8 operations:
+(require 'meta-log-e8)
+(require 'meta-log-e8-theta)
+
+;; For MLSS substrate:
+(require 'meta-log-substrate-runtime)
+(require 'meta-log-binary-substrate)
+(require 'meta-log-provenance)
+
+;; For Canvas API:
+(require 'meta-log-canvas-api)
+(require 'meta-log-protocol)
+(require 'meta-log-server)
 ```
 
 See [docs/MODULES.md](docs/MODULES.md) for complete module documentation and dependency information.
@@ -327,7 +383,8 @@ MIT
 ## Documentation
 
 - [User Guide](docs/USER_GUIDE.md) - General usage guide
-- [API Reference](docs/API_REFERENCE.md) - API documentation
+- [API Reference](docs/API-REFERENCE.md) - Complete API documentation
+- [Glossary](docs/GLOSSARY.md) - Terms and definitions
 - [Module Documentation](docs/MODULES.md) - Optional modules and features
 - [Examples](docs/EXAMPLES.org) - Example Org Mode files
 - [Federation Guide](docs/FEDERATION_GUIDE.md) - Federation setup

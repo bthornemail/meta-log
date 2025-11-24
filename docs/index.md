@@ -156,7 +156,7 @@ M-x package-install-file RET /path/to/meta-log RET
 - [User Guide](USER_GUIDE) - Getting started and basic usage
 - [MLSS Guide](MLSS_GUIDE) - Meta-Log Substrate System documentation
 - [Modules Documentation](MODULES) - Complete module reference
-- [API Reference](API_REFERENCE) - Function and macro reference
+- [API Reference](API-REFERENCE) - Function and macro reference
 
 ### Guides & Use Cases
 - [MLSS Use Cases](MLSS_USE_CASES) - Real-world MLSS applications

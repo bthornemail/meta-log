@@ -193,7 +193,7 @@ Current status of the Meta-Log Substrate System (MLSS) implementation, test resu
 ### For Developers
 
 - Check [MLSS Guide](MLSS_GUIDE) for technical details
-- Review [API Reference](API_REFERENCE) for function documentation
+- Review [API Reference](API-REFERENCE) for function documentation
 - See [Modules](MODULES) for component details
 
 ### For Contributors

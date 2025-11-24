@@ -46,8 +46,9 @@ class StaticAnalyzer:
             try:
                 with open(scm_file, 'r', encoding='utf-8', errors='ignore') as f:
                     for line_num, line in enumerate(f, 1):
-                        # Match: (define (function-name
-                        match = re.search(r'\(define\s+\(([a-zA-Z0-9-]+)', line)
+                        # Match: (define (function-name or (define (function-name?
+                        # Handle Scheme ? suffix for predicate functions
+                        match = re.search(r'\(define\s+\(([a-zA-Z0-9-?]+)', line)
                         if match:
                             func_name = match.group(1)
                             rel_path = str(scm_file.relative_to(self.root_dir))
@@ -74,11 +75,25 @@ class StaticAnalyzer:
                         pattern3 = rf"(apply|funcall)\s+['\"]({re.escape(func_name)})['\"]"
                         # Pattern 4: #'function-name (function reference)
                         pattern4 = rf"#\'({re.escape(func_name)})"
+                        # Pattern 5: (apply (intern "function-name") ...) - dynamic dispatch
+                        pattern5 = rf'\(intern\s+["\']({re.escape(func_name)})["\']'
+                        # Pattern 6: (funcall (intern "function-name") ...)
+                        pattern6 = rf'\(intern\s+["\']({re.escape(func_name)})["\']'
+                        # Pattern 7: String in alist/plist that might be function name
+                        # Look for patterns like (:function "function-name") or ('function "function-name")
+                        pattern7 = rf'["\']({re.escape(func_name)})["\']'
                         
                         matches = (len(re.findall(pattern1, content)) +
                                   len(re.findall(pattern2, content)) +
                                   len(re.findall(pattern3, content)) +
-                                  len(re.findall(pattern4, content)))
+                                  len(re.findall(pattern4, content)) +
+                                  len(re.findall(pattern5, content)) +
+                                  len(re.findall(pattern6, content)))
+                        # For pattern7, be more conservative - only count if near apply/funcall
+                        # This is a heuristic to avoid false positives
+                        pattern7_matches = len(re.findall(rf'(apply|funcall|intern).*?["\']({re.escape(func_name)})["\']', content))
+                        matches += pattern7_matches
+                        
                         if matches > 0:
                             self.function_calls[func_name] += matches
             except Exception as e:
@@ -92,8 +107,20 @@ class StaticAnalyzer:
                 with open(code_file, 'r', encoding='utf-8', errors='ignore') as f:
                     content = f.read()
                     for func_name in self.function_defs.keys():
-                        pattern = rf'\(({re.escape(func_name)})\s'
-                        matches = len(re.findall(pattern, content))
+                        # Handle Scheme ? suffix - search for both with and without ?
+                        # Also handle cases where function is called with ? suffix
+                        pattern1 = rf'\(({re.escape(func_name)})\s'  # Exact match
+                        # If function has ? suffix, also search without it
+                        if func_name.endswith('?'):
+                            base_name = func_name[:-1]
+                            pattern2 = rf'\(({re.escape(base_name)})\s'
+                            matches = (len(re.findall(pattern1, content)) +
+                                      len(re.findall(pattern2, content)))
+                        else:
+                            # If function doesn't have ?, also search with ?
+                            pattern2 = rf'\(({re.escape(func_name)}\?)\s'
+                            matches = (len(re.findall(pattern1, content)) +
+                                      len(re.findall(pattern2, content)))
                         if matches > 0:
                             self.function_calls[func_name] += matches
             except Exception as e:
@@ -236,7 +263,10 @@ class StaticAnalyzer:
             f.write("- Test functions are excluded\n")
             f.write("- Functions only called in their definition file may be legitimate\n")
             f.write("- **Manual review required** before removing any functions\n")
-            f.write("- Public API functions should be reviewed especially carefully\n\n")
+            f.write("- Public API functions should be reviewed especially carefully\n")
+            f.write("- Scheme functions with `?` suffix are now properly detected\n")
+            f.write("- Dynamic dispatch (apply/funcall) is now detected\n")
+            f.write("- Note: Some dynamic dispatch patterns may still be missed\n\n")
             
             f.write("## Recommendations\n\n")
             if self.unused_functions:

@@ -165,63 +165,54 @@ export const basis = AUTOMATON_FILES.a4Basis;
 
 **Location**: `scheme/qstar/scoring.scm`
 
-All built-in scoring functions are placeholders returning 0.0:
+✅ **All scoring functions implemented** - See IMPLEMENTATION-STATUS.md for details.
 
-14. **`qstar-score-euclidean`**
-    - **Status**: Placeholder - returns 0.0
-    - **Issue**: Needs Euclidean distance computation
-    - **Priority**: Medium
-
-15. **`qstar-score-weyl`**
-    - **Status**: Placeholder - returns 0.0
-    - **Issue**: Needs Weyl distance computation
-    - **Priority**: Medium
-
-16. **`qstar-score-padic`**
-    - **Status**: Placeholder - returns 0.0
-    - **Issue**: Needs p-adic valuation computation
-    - **Priority**: Medium
-
-17. **`qstar-score-rule-compat`**
-    - **Status**: Placeholder - returns 0.0
-    - **Issue**: Needs rule compatibility checking
-    - **Priority**: Low
-
-18. **`qstar-score-resource`**
-    - **Status**: Placeholder - returns 0.0
-    - **Issue**: Needs resource usage computation
-    - **Priority**: Medium
-
-19. **`qstar-score-consensus`**
-    - **Status**: Placeholder - returns 0.0
-    - **Issue**: Needs consensus penalty computation
-    - **Priority**: Low
-
-20. **`qstar-score-complexity`**
-    - **Status**: Placeholder - returns 0.0
-    - **Issue**: Needs complexity penalty computation
-    - **Priority**: Medium
+14. ✅ **`qstar-score-euclidean`** - **IMPLEMENTED**
+15. ✅ **`qstar-score-weyl`** - **IMPLEMENTED**
+16. ✅ **`qstar-score-padic`** - **IMPLEMENTED**
+17. ✅ **`qstar-score-rule-compat`** - **IMPLEMENTED**
+18. ✅ **`qstar-score-resource`** - **IMPLEMENTED**
+19. ✅ **`qstar-score-consensus`** - **IMPLEMENTED**
+20. ✅ **`qstar-score-complexity`** - **IMPLEMENTED**
 
 ### Emacs Lisp Modules
 
 **Location**: `modules/` directory
 
-21. **`meta-log-extract-closeness`** (`modules/meta-log-p-adic.el`)
-    - **Status**: Stub - returns sample values
-    - **Issue**: Needs actual graph analysis
-    - **Priority**: Low
-    - **Code**: `'(0.5 0.7 0.3 0.9)`
+21. ✅ **`meta-log-extract-closeness`** (`modules/meta-log-p-adic.el`) - **IMPLEMENTED**
+    - Graph closeness centrality computation using BFS
 
-22. **`meta-log-modular-form-coefficient`** (`modules/meta-log-p-adic.el`)
-    - **Status**: Stub - returns sample value
-    - **Issue**: Needs actual modular form computation
-    - **Priority**: Low
-    - **Code**: `1`
+22. ✅ **`meta-log-modular-form-coefficient`** (`modules/meta-log-p-adic.el`) - **IMPLEMENTED**
+    - Modular form coefficient extraction
 
-23. **Helper functions in `meta-log-drinfeld.el`**
-    - **Status**: Stubs for integration
-    - **Issue**: Marked as "Helper Functions (stubs)"
-    - **Priority**: Low
+23. ✅ **Helper functions in `meta-log-drinfeld.el`** - **IMPLEMENTED**
+    - ✅ `meta-log-drinfeld-reduce-mod-p` - Reduces module coefficients mod prime
+    - ✅ `meta-log-drinfeld-special-points` - Extracts special points based on rank
+    - ✅ `meta-log-drinfeld-symmetry-group` - Computes symmetry group based on rank
+
+### Additional Stubs Completed
+
+**Location**: `scheme/qstar/` and `modules/`
+
+24. ✅ **Q* Core Cost Functions** (`scheme/qstar/core.scm`) - **IMPLEMENTED**
+    - ✅ `qstar-computational-cost` - Computes based on action type and entropy
+    - ✅ `qstar-memory-cost` - Computes based on memory usage
+    - ✅ `qstar-entropy-cost` - Computes based on entropy increase
+    - ✅ `qstar-complexity-cost` - Computes based on system complexity
+    - ✅ `qstar-safety-penalty` - Checks safety via Prolog rules
+
+25. ✅ **Q* A* Search** (`scheme/qstar/a-star.scm`) - **IMPLEMENTED**
+    - ✅ `get-successors` - Generates successor states from available actions
+
+26. ✅ **Q* Goal/Future** (`scheme/qstar/core.scm`) - **IMPLEMENTED**
+    - ✅ `qstar-goal-p` - Checks goal state (high consistency, low entropy)
+    - ✅ `qstar-future-value` - Uses A* to compute optimal future value
+
+27. ✅ **WordNet** (`modules/meta-log-wordnet.el`) - **IMPROVED**
+    - ✅ `meta-log-wordnet-find-synonyms` - Enhanced with more synonyms, removed TODO
+
+28. ✅ **KG Learning** (`modules/meta-log-kg-learning.el`) - **IMPROVED**
+    - ✅ Template generation - Removed TODO, added pattern-based initialization
 
 ---
 

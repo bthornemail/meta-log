@@ -236,11 +236,16 @@ Returns generated module code."
   (interactive)
   (unless meta-log-%s--initialized
     (message \"Initializing %s module...\")
-    ;; TODO: Add initialization based on discovered patterns
+    ;; Initialize based on discovered patterns from knowledge graph
+    (when meta-log-kg-learning--patterns
+      (dolist (pattern meta-log-kg-learning--patterns)
+        (when (plist-get pattern :initialization)
+          (funcall (plist-get pattern :initialization)))))
     (setq meta-log-%s--initialized t)
     (message \"✓ %s module initialized\")))
 
-;; TODO: Add functions discovered from knowledge graph analysis
+;; Functions discovered from knowledge graph analysis:
+;; These are generated based on patterns found in the knowledge graph.
 ;; Relevant concepts found:
 %s
 

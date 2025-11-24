@@ -10,6 +10,18 @@
 
 ;; Load substrate modules
 (load "../substrate/runtime.scm")
+(load "../substrate/prolog-interface.scm")
+
+;; Helper: Extract property from state (needed for cost functions)
+(define (qstar-get-property state prop-name)
+  "Extract property from state global properties.
+PROP-NAME: property name symbol
+Returns property value or #f."
+  (let ((props (list-ref state 3)))  ; global-properties is at index 3
+    (let ((prop-pair (assoc prop-name props)))
+      (if prop-pair
+          (cdr prop-pair)
+          #f))))
 
 ;; Q* Configuration
 (define *qstar-gamma* 0.95)  ; discount factor
@@ -76,29 +88,100 @@ Returns alist of (component . cost)."
       (safety . ,safety))))
 
 (define (qstar-computational-cost state action)
-  "Compute computational cost component."
-  ;; Placeholder - would compute based on operation complexity
-  0.1)
+  "Compute computational cost component.
+Based on action type and operator complexity."
+  (let ((action-type (list-ref action 1))
+        (operator (list-ref action 2))
+        (entropy (qstar-get-property state 'total-entropy)))
+    ;; Base cost by action type
+    (let ((base-cost (case action-type
+                       ((transform) 0.2)
+                       ((synthesize) 0.3)
+                       ((reason) 0.15)
+                       ((optimize) 0.25)
+                       (else 0.1))))
+      ;; Scale by entropy (higher entropy = more computation)
+      (let ((entropy-factor (if entropy
+                               (* entropy 0.01)
+                               0.0)))
+        (+ base-cost entropy-factor)))))
 
 (define (qstar-memory-cost state action)
-  "Compute memory cost component."
-  ;; Placeholder
-  0.05)
+  "Compute memory cost component.
+Based on memory usage and action memory requirements."
+  (let ((mem-state (qstar-get-property state 'total-memory-bytes))
+        (action-type (list-ref action 1)))
+    ;; Base memory cost by action type
+    (let ((base-cost (case action-type
+                       ((transform) 0.05)
+                       ((synthesize) 0.1)
+                       ((reason) 0.03)
+                       ((optimize) 0.08)
+                       (else 0.05))))
+      ;; Scale by current memory (normalized)
+      (let ((mem-factor (if mem-state
+                           (* mem-state 0.000001)  ; 1MB = 0.001 cost
+                           0.0)))
+        (+ base-cost mem-factor)))))
 
 (define (qstar-entropy-cost state action)
-  "Compute entropy cost component."
-  ;; Placeholder
-  0.02)
+  "Compute entropy cost component.
+Based on entropy increase from action."
+  (let ((entropy-state (qstar-get-property state 'total-entropy))
+        (action-type (list-ref action 1)))
+    ;; Base entropy cost by action type
+    (let ((base-cost (case action-type
+                       ((transform) 0.03)
+                       ((synthesize) 0.05)
+                       ((reason) 0.02)
+                       ((optimize) 0.01)  ; Optimization reduces entropy
+                       (else 0.02))))
+      ;; Scale by current entropy
+      (let ((entropy-factor (if entropy-state
+                               (* entropy-state 0.01)
+                               0.0)))
+        (+ base-cost entropy-factor)))))
 
 (define (qstar-complexity-cost state action)
-  "Compute complexity cost component."
-  ;; Placeholder
-  0.15)
+  "Compute complexity cost component.
+Based on system complexity and action complexity."
+  (let ((entropy-state (qstar-get-property state 'total-entropy))
+        (mem-state (qstar-get-property state 'total-memory-bytes))
+        (action-type (list-ref action 1)))
+    ;; Base complexity cost by action type
+    (let ((base-cost (case action-type
+                       ((transform) 0.2)
+                       ((synthesize) 0.25)
+                       ((reason) 0.15)
+                       ((optimize) 0.1)  ; Optimization reduces complexity
+                       (else 0.15))))
+      ;; Scale by entropy and memory (complexity indicators)
+      (let ((entropy-factor (if entropy-state
+                               (* entropy-state 0.02)
+                               0.0))
+            (mem-factor (if mem-state
+                          (* mem-state 0.0000005)
+                          0.0)))
+        (+ base-cost entropy-factor mem-factor)))))
 
 (define (qstar-safety-penalty state action)
-  "Compute safety penalty component."
-  ;; Placeholder - would check safety constraints
-  0.0)
+  "Compute safety penalty component.
+Checks if action violates safety constraints via Prolog rules."
+  (let ((action-type (list-ref action 1))
+        (operator (list-ref action 2)))
+    ;; Check safety constraints via Prolog
+    ;; Query: (safe-action action-type operator)
+    (let ((safety-check (prolog-query `(safe-action ,action-type ,operator))))
+      (if (null? safety-check)
+          ;; No safety rule allows this - apply penalty
+          (case action-type
+            ((transform) 0.5)  ; Transformations can be risky
+            ((synthesize) 0.3)  ; Synthesis is moderate risk
+            ((reason) 0.1)      ; Reasoning is low risk
+            ((optimize) 0.2)    ; Optimization is moderate risk
+            (else 0.3))
+          ;; Action is safe - no penalty
+          0.0))))
 
 (define (qstar-apply-action state action)
   "Apply action to state, return next state.
@@ -123,14 +206,29 @@ Now integrates with action executor for actual execution."
             updated-properties))))
 
 (define (qstar-goal-p state)
-  "Check if state is a goal state."
-  ;; Placeholder
-  #f)
+  "Check if state is a goal state.
+Goal states have high consistency and low entropy."
+  (let ((consistency (qstar-get-property state 'consistency-score))
+        (entropy (qstar-get-property state 'total-entropy)))
+    ;; Goal: high consistency (>= 0.8) and low entropy (<= 1.0)
+    (and consistency
+         entropy
+         (>= consistency 0.8)
+         (<= entropy 1.0))))
 
 (define (qstar-future-value state)
-  "Compute future value using dynamic programming or A*."
-  ;; Placeholder - would use DP or A* to compute optimal future value
-  0.0)
+  "Compute future value using dynamic programming or A*.
+Uses A* search to estimate optimal future value from current state."
+  ;; Load A* search
+  (load "../qstar/a-star.scm")
+  ;; Use A* to find path to goal, return negative of path cost
+  (let ((goal-pred qstar-goal-p)
+        (heuristic heuristic-euclidean)
+        (opts '((max-nodes . 100))))
+    (let ((result (qstar-a-star state goal-pred heuristic opts)))
+      (let ((path-cost (list-ref result 1)))
+        ;; Future value is negative of cost (lower cost = higher value)
+        (- path-cost)))))
 
 ;; Policy Selection
 

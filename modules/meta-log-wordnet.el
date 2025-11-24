@@ -151,20 +151,34 @@ Returns dimension string or nil."
 
 (defun meta-log-wordnet-find-synonyms (word)
   "Find synonyms for WORD using WordNet.
-Returns list of synonyms."
-  ;; TODO: Integrate with actual WordNet service
-  ;; For now, return hardcoded synonyms
+Returns list of synonyms.
+Note: This uses an extended synonym map. For full WordNet integration,
+consider using a WordNet library or API service."
   (let ((synonym-map
-         '(("peer" . ("node" "identity" "self"))
-           ("template" . ("pattern" "example" "model"))
-           ("identity" . ("self" "peer" "node"))
-           ("network" . ("connection" "link" "graph"))
-           ("crypto" . ("encryption" "cryptography" "security"))
-           ("document" . ("guide" "readme" "manual")))))
+         '(("peer" . ("node" "identity" "self" "entity" "agent"))
+           ("template" . ("pattern" "example" "model" "schema" "form"))
+           ("identity" . ("self" "peer" "node" "entity" "agent"))
+           ("network" . ("connection" "link" "graph" "mesh" "web"))
+           ("crypto" . ("encryption" "cryptography" "security" "cipher"))
+           ("document" . ("guide" "readme" "manual" "text" "file"))
+           ("action" . ("operation" "task" "function" "procedure"))
+           ("state" . ("condition" "status" "situation" "mode"))
+           ("consensus" . ("agreement" "unanimity" "accord" "harmony"))
+           ("partition" . ("division" "split" "separation" "segment"))
+           ("quorum" . ("majority" "threshold" "minimum" "requirement"))
+           ("geometric" . ("spatial" "topological" "structural"))
+           ("symbolic" . ("logical" "abstract" "representational"))
+           ("waveform" . ("signal" "oscillation" "frequency" "pattern"))
+           ("binary" . ("digital" "bitwise" "base-2" "dual")))))
     (let ((synonyms (assoc word synonym-map)))
       (if synonyms
           (cdr synonyms)
-        '()))))
+        ;; If word not found, try case-insensitive match
+        (let ((lower-word (downcase word)))
+          (let ((synonyms-lower (assoc lower-word synonym-map)))
+            (if synonyms-lower
+                (cdr synonyms-lower)
+              '())))))))
 
 (defun meta-log-wordnet-semantic-similarity (text1 text2)
   "Calculate semantic similarity between TEXT1 and TEXT2.

@@ -35,6 +35,17 @@ Returns property value or #f."
           (cdr prop-pair)
           #f))))
 
+;; Helper: Create Q* action (from core.scm)
+(define (make-qstar-action type operator params)
+  "Create Q* action representation.
+TYPE: 'transform 'synthesize 'reason 'optimize
+OPERATOR: action operator name
+PARAMS: alist of parameters"
+  (list 'qstar-action
+        type
+        operator
+        params))
+
 (define (extract-e8-coords geometric-layer)
   "Extract E8 coordinates from geometric layer.
 GEOMETRIC-LAYER: list of geometric objects
@@ -145,9 +156,44 @@ Returns (path cost nodes-expanded)."
 
 (define (get-successors state)
   "Get successor states from current state.
+Generates successor states by applying available actions.
 Returns list of (action . next-state)."
-  ;; Placeholder - would generate actual successors
-  '())
+  ;; Generate actions based on state properties
+  (let ((action-types '(transform synthesize reason optimize))
+        (operators (generate-operators state))
+        (successors '()))
+    ;; Generate successors for each action type and operator
+    (let loop-types ((remaining-types action-types)
+                     (acc '()))
+      (if (null? remaining-types)
+          acc
+          (let ((action-type (car remaining-types)))
+            (let loop-ops ((remaining-ops operators)
+                           (acc-ops acc))
+              (if (null? remaining-ops)
+                  (loop-types (cdr remaining-types) acc-ops)
+                  (let ((operator (car remaining-ops))
+                        (action (make-qstar-action action-type operator '())))
+                    ;; Apply action to get next state
+                    (let ((next-state (qstar-apply-action state action)))
+                      (loop-ops (cdr remaining-ops)
+                               (cons (cons action next-state) acc-ops)))))))))))
+
+(define (generate-operators state)
+  "Generate available operators based on state.
+Returns list of operator symbols."
+  (let ((geo-layer (qstar-get-layer state 'geometric))
+        (symbolic-layer (qstar-get-layer state 'symbolic))
+        (operators '()))
+    ;; Add geometric operators if geometric layer exists
+    (if (not (null? geo-layer))
+        (set! operators (append operators '(project-e8 compute-distance))))
+    ;; Add symbolic operators if symbolic layer exists
+    (if (not (null? symbolic-layer))
+        (set! operators (append operators '(query-prolog query-datalog))))
+    ;; Always available operators
+    (set! operators (append operators '(store-cbs transform-data)))
+    operators))
 
 (define (add-successors open closed successors parent heuristic goal-pred)
   "Add successor nodes to open set."

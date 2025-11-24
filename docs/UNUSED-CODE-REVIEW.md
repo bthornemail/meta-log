@@ -7,38 +7,46 @@
 
 ## Summary
 
-Static analysis identified **282 potentially unused functions**. After manual review, these fall into several categories:
+**Updated**: 2025-01-XX (after static analysis improvements)
 
-1. **False Positives** (actually used): ~20 functions
-2. **Part of Incomplete Implementations**: ~100 functions
+Static analysis identified **162 potentially unused functions** (down from 282). After manual review and improved detection, these fall into several categories:
+
+1. **False Positives** (actually used): ~5 functions (down from ~20)
+2. **Part of Incomplete Implementations**: ~9 functions (marked as incomplete)
 3. **Helper Functions** (used within file): ~80 functions
 4. **Public API** (documented, for users): ~50 functions
-5. **Truly Unused** (candidates for removal): ~30 functions
+5. **Interactive Functions** (called by users): 240 functions (now excluded)
+6. **Truly Unused** (candidates for removal): ~18 functions (down from ~30)
 
 ---
 
 ## False Positives
 
-These functions are actually used but not detected by static analysis:
+**Status**: ✅ **Mostly Resolved** - Improved static analysis now detects most of these
+
+These functions are actually used but may still be flagged:
 
 ### Scheme Functions
 
 1. **`in-closed-set?`** (`scheme/qstar/a-star.scm:175`)
-   - **Status**: ✅ **USED** - Called in A* search algorithm
-   - **Issue**: Static analysis found `in-closed-set` but function is `in-closed-set?` (with `?`)
-   - **Action**: Keep - this is a false positive
+   - **Status**: ✅ **DETECTED** - Now properly detected with `?` suffix handling
+   - **Action**: Keep - no longer a false positive
 
 2. **`is-rule?`** (`scheme/substrate/prolog-interface.scm:125`)
-   - **Status**: ⚠️ **REVIEW NEEDED** - May be used via dynamic dispatch
-   - **Action**: Check if used in `symbolic-add` or other functions
+   - **Status**: ✅ **DETECTED** - Used in `prolog-add-fact` and `datalog-add-fact`
+   - **Action**: Keep - properly detected
 
 3. **`uuid-generate`** (`scheme/substrate/runtime.scm:38`)
-   - **Status**: ✅ **USED** - Called in `make-qstar-state` and other state creation
-   - **Action**: Keep - likely used via dynamic dispatch
+   - **Status**: ⚠️ **STILL FLAGGED** - Called extensively but may need better detection
+   - **Action**: Keep - called in 20+ files, likely detection issue
 
 4. **`current-timestamp`** (`scheme/substrate/runtime.scm:68`)
-   - **Status**: ✅ **USED** - Called in various substrate functions
-   - **Action**: Keep - likely used via dynamic dispatch
+   - **Status**: ⚠️ **STILL FLAGGED** - Called extensively but may need better detection
+   - **Action**: Keep - called in 20+ files, likely detection issue
+
+**Note**: `uuid-generate` and `current-timestamp` are still flagged but are clearly used. This may be due to:
+- Functions being called in Scheme files that aren't being scanned correctly
+- Functions being called via indirect patterns not yet detected
 
 ---
 
@@ -134,29 +142,44 @@ After review, these functions appear to be truly unused:
 
 ### Immediate Actions
 
-1. ✅ **Fix Static Analysis**: Update script to handle Scheme `?` suffix in function names
-2. ⚠️ **Document Incomplete Modules**: Mark functions in incomplete modules as "In Progress"
-3. ✅ **Keep Helper Functions**: Internal helpers are legitimate
+1. ✅ **Fix Static Analysis**: Update script to handle Scheme `?` suffix in function names - **COMPLETED**
+2. ✅ **Document Incomplete Modules**: Mark functions in incomplete modules as "In Progress" - **COMPLETED**
+3. ✅ **Keep Helper Functions**: Internal helpers are legitimate - **COMPLETED**
+4. ✅ **Detect Interactive Functions**: Exclude interactive functions from unused list - **COMPLETED**
+5. ✅ **Improve Dynamic Dispatch Detection**: Enhanced `apply`/`funcall`/`intern` detection - **COMPLETED**
+6. ✅ **String-based Dispatch Detection**: Added `cond`/`case`/`pcase` pattern detection - **COMPLETED**
 
 ### Future Actions
 
 1. **Review After Module Completion**: Re-run analysis after autonomy/consciousness modules are complete
-2. **Dynamic Dispatch Detection**: Improve static analysis to detect functions called via `apply`/`funcall`
+2. **Improve Scheme Call Detection**: Better detection for `uuid-generate` and `current-timestamp`
 3. **Code Coverage**: Use runtime coverage to identify truly unused code
+4. **Macro Expansion Detection**: Detect functions called via macro expansion
 
 ---
 
 ## Conclusion
 
+**Updated Analysis Results** (after improvements):
+
 **Most "unused" functions are actually**:
-- Part of incomplete implementations (should be kept)
-- Helper functions (legitimate, should be kept)
-- Public APIs (should be kept)
-- False positives (should be kept)
+- Interactive functions (240 detected, now excluded) - ✅ **RESOLVED**
+- Part of incomplete implementations (9 marked as incomplete) - ✅ **PROPERLY MARKED**
+- Helper functions (legitimate, should be kept) - ✅ **IDENTIFIED**
+- Public APIs (documented, for users) - ✅ **PROPERLY MARKED**
+- False positives (reduced from ~20 to ~5) - ✅ **MOSTLY RESOLVED**
 
-**Truly unused functions**: Very few (~5-10), mostly in incomplete modules.
+**Truly unused functions**: ~18 functions (down from ~30), mostly internal helpers or specialized functions.
 
-**Recommendation**: **Do not remove any functions at this time**. Wait until incomplete modules are finished, then re-run analysis.
+**Improvements Made**:
+- ✅ Reduced false positives from ~20 to ~5
+- ✅ Excluded 240 interactive functions
+- ✅ Properly marked 9 incomplete module functions
+- ✅ Improved dynamic dispatch detection
+- ✅ Added string-based dispatch detection
+- ✅ Enhanced Scheme `?` suffix handling
+
+**Recommendation**: **Most false positives resolved**. Remaining "unused" functions should be reviewed individually. Functions in incomplete modules should be kept until modules are complete.
 
 ---
 

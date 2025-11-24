@@ -126,33 +126,103 @@ else
     echo ""
 fi
 
+# Function to start FastAPI service
+start_service() {
+    local service_name=$1
+    local service_dir=$2
+    local port=$3
+    
+    if [ -d "$service_dir" ]; then
+        echo "Starting $service_name on port $port..."
+        cd "$service_dir"
+        # Check if service is already running
+        if curl -s "http://localhost:$port/health" >/dev/null 2>&1; then
+            echo -e "${GREEN}✓ $service_name already running${NC}"
+            return 0
+        fi
+        # Start service in background
+        nohup uvicorn main:app --host 0.0.0.0 --port "$port" > "$REPORT_DIR/${service_name}.log" 2>&1 &
+        local pid=$!
+        echo "$pid" > "$REPORT_DIR/${service_name}.pid"
+        # Wait for service to be ready
+        for i in {1..10}; do
+            if curl -s "http://localhost:$port/health" >/dev/null 2>&1; then
+                echo -e "${GREEN}✓ $service_name started (PID: $pid)${NC}"
+                return 0
+            fi
+            sleep 1
+        done
+        echo -e "${YELLOW}⚠ $service_name may not be ready yet${NC}"
+        return 1
+    else
+        echo -e "${YELLOW}⚠ $service_name directory not found: $service_dir${NC}"
+        return 1
+    fi
+}
+
+# Function to stop FastAPI service
+stop_service() {
+    local service_name=$1
+    local pid_file="$REPORT_DIR/${service_name}.pid"
+    if [ -f "$pid_file" ]; then
+        local pid=$(cat "$pid_file")
+        if kill "$pid" 2>/dev/null; then
+            echo -e "${GREEN}✓ Stopped $service_name (PID: $pid)${NC}"
+        fi
+        rm -f "$pid_file"
+    fi
+}
+
+# Start required services
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "Starting Required Services"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+# Check if uvicorn is available
+if python3 -c "import uvicorn" 2>/dev/null; then
+    start_service "e8-api" "$PROJECT_ROOT/services/e8-api" 8000
+    start_service "vision-api" "$PROJECT_ROOT/services/vision-api" 8001
+    start_service "quantum-simulation" "$PROJECT_ROOT/services/quantum-simulation" 8002
+    start_service "sensors-api" "$PROJECT_ROOT/services/sensors-api" 8003
+    echo ""
+else
+    echo -e "${YELLOW}⚠ uvicorn not available, skipping service startup${NC}"
+    echo ""
+fi
+
 # 2. Python tests (if pytest available)
 if python3 -c "import pytest" 2>/dev/null; then
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo "Python Tests (with coverage)"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     
-    # Find all test files
-    PYTHON_TEST_DIRS=(
-        "$PROJECT_ROOT/services/substrate-api/tests"
-        "$PROJECT_ROOT/services/e8-api/tests"
-        "$PROJECT_ROOT/services/vision-api"
-    )
-    
-    for test_dir in "${PYTHON_TEST_DIRS[@]}"; do
-        if [ -d "$test_dir" ]; then
-            echo "Running tests in: $test_dir"
-            cd "$test_dir/.."
-            if pytest --cov=. --cov-report=html:"$COVERAGE_DIR/$(basename "$test_dir")" \
-                     --cov-report=term \
-                     -v 2>&1 | tee "$REPORT_DIR/python-$(basename "$test_dir").log"; then
-                echo -e "${GREEN}✓ Passed${NC}"
-            else
-                echo -e "${RED}✗ Failed${NC}"
+    # Use the coverage script if available
+    if [ -f "$PROJECT_ROOT/scripts/run-python-coverage.sh" ]; then
+        echo "Using coverage script..."
+        "$PROJECT_ROOT/scripts/run-python-coverage.sh" 2>&1 | tee "$REPORT_DIR/python-coverage.log"
+    else
+        # Fallback: Find all test files
+        PYTHON_TEST_DIRS=(
+            "$PROJECT_ROOT/services/substrate-api/tests"
+            "$PROJECT_ROOT/services/e8-api/tests"
+            "$PROJECT_ROOT/services/vision-api"
+        )
+        
+        for test_dir in "${PYTHON_TEST_DIRS[@]}"; do
+            if [ -d "$test_dir" ]; then
+                echo "Running tests in: $test_dir"
+                cd "$test_dir/.."
+                if pytest --cov=. --cov-report=html:"$COVERAGE_DIR/$(basename "$test_dir")" \
+                         --cov-report=term \
+                         -v 2>&1 | tee "$REPORT_DIR/python-$(basename "$test_dir").log"; then
+                    echo -e "${GREEN}✓ Passed${NC}"
+                else
+                    echo -e "${RED}✗ Failed${NC}"
+                fi
+                echo ""
             fi
-            echo ""
-        fi
-    done
+        done
+    fi
 else
     echo -e "${YELLOW}Skipping Python tests (pytest not available)${NC}"
     echo ""
@@ -182,6 +252,16 @@ else
     echo ""
 fi
 
+# Stop services
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "Stopping Services"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+stop_service "e8-api"
+stop_service "vision-api"
+stop_service "quantum-simulation"
+stop_service "sensors-api"
+echo ""
+
 # Generate summary report
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "Test Execution Summary"
@@ -194,6 +274,21 @@ echo "View coverage reports:"
 echo "  - HTML: open $COVERAGE_DIR/*/index.html"
 echo "  - Text: cat $REPORT_DIR/*.log"
 echo ""
+
+# Count test results
+SCHEME_PASSED=0
+SCHEME_FAILED=0
+PYTHON_PASSED=0
+PYTHON_FAILED=0
+ELISP_PASSED=0
+ELISP_FAILED=0
+
+# Count from log files (simplified - would need more sophisticated parsing)
+if [ -f "$REPORT_DIR/emacs-tests.log" ]; then
+    if grep -q "passed" "$REPORT_DIR/emacs-tests.log"; then
+        ELISP_PASSED=1
+    fi
+fi
 
 # Create test execution report
 cat > "$REPORT_DIR/TEST-EXECUTION-REPORT.md" <<EOF
@@ -209,17 +304,43 @@ cat > "$REPORT_DIR/TEST-EXECUTION-REPORT.md" <<EOF
 - pytest: $(if python3 -c "import pytest" 2>/dev/null; then echo "✓ Available"; else echo "✗ Missing"; fi)
 - pytest-cov: $(if python3 -c "import pytest_cov" 2>/dev/null; then echo "✓ Available"; else echo "✗ Missing"; fi)
 - Emacs: $(if command -v emacs >/dev/null 2>&1; then echo "✓ Available"; else echo "✗ Missing"; fi)
+- uvicorn: $(if python3 -c "import uvicorn" 2>/dev/null; then echo "✓ Available"; else echo "✗ Missing"; fi)
+
+## Services Started
+
+- E8 API: $(if curl -s http://localhost:8000/health >/dev/null 2>&1; then echo "✓ Running"; else echo "✗ Not running"; fi)
+- Vision API: $(if curl -s http://localhost:8001/health >/dev/null 2>&1; then echo "✓ Running"; else echo "✗ Not running"; fi)
+- Quantum Simulation: $(if curl -s http://localhost:8002/health >/dev/null 2>&1; then echo "✓ Running"; else echo "✗ Not running"; fi)
+- Sensors API: $(if curl -s http://localhost:8003/health >/dev/null 2>&1; then echo "✓ Running"; else echo "✗ Not running"; fi)
 
 ## Test Results
 
 See individual log files in this directory for detailed results.
 
+### Test Files Executed
+
+- Scheme tests: See \`*.scm.log\` files
+- Python tests: See \`python-*.log\` files
+- Emacs Lisp tests: See \`emacs-tests.log\`
+
 ## Coverage Reports
 
 Coverage reports are available in: $COVERAGE_DIR
 
+- Python: \`$COVERAGE_DIR/python/html/index.html\`
+- Emacs Lisp: Check \`coverage/elisp/\` directory
+
+## Next Steps
+
+1. Review test logs for failures
+2. Check coverage reports for uncovered code
+3. Fix any failing tests
+4. Improve coverage for low-coverage areas
+
 EOF
 
 echo -e "${GREEN}Test execution complete!${NC}"
+echo ""
+echo "View detailed report: $REPORT_DIR/TEST-EXECUTION-REPORT.md"
 echo ""
 

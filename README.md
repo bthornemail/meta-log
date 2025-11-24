@@ -4,7 +4,7 @@ AI-powered personal knowledge system with natural language queries, automatic kn
 
 ---
 
-## 🚀 **[Quick Start Guide](QUICKSTART.md)** ← **Start Here!**
+## 🚀 **[Quick Start Guide](docs/GETTING-STARTED.md)** ← **Start Here!**
 
 Get up and running in **under 5 minutes**:
 

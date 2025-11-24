@@ -3,29 +3,44 @@ Tests for Substrate API service.
 """
 
 import pytest
-from fastapi.testclient import TestClient
 import base64
+from httpx import ASGITransport, AsyncClient
+import asyncio
 
 from app import app
 
-client = TestClient(app)
+# Use httpx AsyncClient for starlette 0.27.0 compatibility
+@pytest.fixture
+def client():
+    """Create async test client"""
+    transport = ASGITransport(app=app)
+    return AsyncClient(transport=transport, base_url="http://test")
+
+@pytest.fixture
+def sync_client():
+    """Create sync test client using httpx"""
+    from httpx import Client
+    transport = ASGITransport(app=app)
+    return Client(transport=transport, base_url="http://test", follow_redirects=True)
 
 
-def test_health_check():
+@pytest.mark.asyncio
+async def test_health_check(client):
     """Test health check endpoint."""
-    response = client.get("/api/v1/health")
+    response = await client.get("/api/v1/health")
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "healthy"
     assert data["service"] == "substrate-api"
 
 
-def test_hash_endpoint():
+@pytest.mark.asyncio
+async def test_hash_endpoint(client):
     """Test hash computation endpoint."""
     test_data = b"\x01\x02\x03\x04"
     encoded = base64.b64encode(test_data).decode('utf-8')
     
-    response = client.post(
+    response = await client.post(
         "/api/v1/substrate/hash",
         json={"data": encoded, "algorithm": "sha3-256"}
     )
@@ -36,12 +51,13 @@ def test_hash_endpoint():
     assert len(data["hash"]) == 64  # SHA3-256 hex length
 
 
-def test_hash_sha3_512():
+@pytest.mark.asyncio
+async def test_hash_sha3_512(client):
     """Test SHA3-512 hashing."""
     test_data = b"\x01\x02\x03\x04"
     encoded = base64.b64encode(test_data).decode('utf-8')
     
-    response = client.post(
+    response = await client.post(
         "/api/v1/substrate/hash",
         json={"data": encoded, "algorithm": "sha3-512"}
     )
@@ -51,24 +67,26 @@ def test_hash_sha3_512():
     assert len(data["hash"]) == 128  # SHA3-512 hex length
 
 
-def test_hash_invalid_algorithm():
+@pytest.mark.asyncio
+async def test_hash_invalid_algorithm(client):
     """Test hash with invalid algorithm."""
     test_data = b"\x01\x02\x03\x04"
     encoded = base64.b64encode(test_data).decode('utf-8')
     
-    response = client.post(
+    response = await client.post(
         "/api/v1/substrate/hash",
         json={"data": encoded, "algorithm": "md5"}
     )
     assert response.status_code == 400
 
 
-def test_compress_endpoint():
+@pytest.mark.asyncio
+async def test_compress_endpoint(client):
     """Test compression endpoint."""
     test_data = b"x" * 1000  # 1000 bytes of 'x'
     encoded = base64.b64encode(test_data).decode('utf-8')
     
-    response = client.post(
+    response = await client.post(
         "/api/v1/substrate/compress",
         json={"data": encoded, "algorithm": "deflate"}
     )
@@ -80,12 +98,13 @@ def test_compress_endpoint():
     assert 0 < data["ratio"] < 1
 
 
-def test_compress_invalid_algorithm():
+@pytest.mark.asyncio
+async def test_compress_invalid_algorithm(client):
     """Test compression with invalid algorithm."""
     test_data = b"\x01\x02\x03\x04"
     encoded = base64.b64encode(test_data).decode('utf-8')
     
-    response = client.post(
+    response = await client.post(
         "/api/v1/substrate/compress",
         json={"data": encoded, "algorithm": "gzip"}
     )

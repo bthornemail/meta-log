@@ -75,3 +75,4 @@ echo ""
 echo "Coverage reports should be in: $COVERAGE_DIR"
 echo "Check undercover.el documentation for report location."
 
+

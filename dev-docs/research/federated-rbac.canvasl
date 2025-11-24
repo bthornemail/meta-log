@@ -24,3 +24,4 @@
 {"id":"Economic_Integration", "type":"include", "links":["../token.json","../marketplace.json","../service.json"], "role":"permission-for-nfts", "bipartite":{"partition":"topology", "bqf":{"coefficients":[1,1,1], "form":"x²+xy+y²", "signature":"pairing"}}}
 
 
+

@@ -36,3 +36,4 @@ echo "  - HTML: $COVERAGE_DIR/html/index.html"
 echo "  - XML:  $COVERAGE_DIR/coverage.xml"
 echo "  - JSON: $COVERAGE_DIR/coverage.json"
 
+

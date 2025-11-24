@@ -6,16 +6,22 @@ Tests for Python FastAPI service
 import pytest
 import requests
 import numpy as np
-from fastapi.testclient import TestClient
+from httpx import ASGITransport, AsyncClient
 
 from app import app
 
-client = TestClient(app)
+# Use httpx AsyncClient for starlette 0.27.0 compatibility
+@pytest.fixture
+def client():
+    """Create async test client"""
+    transport = ASGITransport(app=app)
+    return AsyncClient(transport=transport, base_url="http://test")
 
 
-def test_health_check():
+@pytest.mark.asyncio
+async def test_health_check(client):
     """Test health check endpoint"""
-    response = client.get("/api/v1/health")
+    response = await client.get("/api/v1/health")
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "healthy"
@@ -23,9 +29,10 @@ def test_health_check():
     assert "theta_coefficients" in data
 
 
-def test_get_e8_point():
+@pytest.mark.asyncio
+async def test_get_e8_point(client):
     """Test getting E8 point from BIP32 path"""
-    response = client.get("/api/v1/e8/point/m/44'/0'/0'/0/0")
+    response = await client.get("/api/v1/e8/point/m/44'/0'/0'/0/0")
     assert response.status_code == 200
     data = response.json()
     assert "coords" in data
@@ -35,9 +42,17 @@ def test_get_e8_point():
     assert "is_root" in data
 
 
-def test_verify_frbac_delegation():
+@pytest.mark.asyncio
+async def test_get_e8_point_invalid_path(client):
+    """Test getting E8 point with invalid path"""
+    response = await client.get("/api/v1/e8/point/invalid/path")
+    assert response.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_verify_frbac_delegation(client):
     """Test FRBAC delegation verification"""
-    response = client.post(
+    response = await client.post(
         "/api/v1/e8/verify",
         json={
             "master_path": "m/44'/0'/0'",
@@ -48,9 +63,23 @@ def test_verify_frbac_delegation():
     assert isinstance(response.json(), bool)
 
 
-def test_shortest_path():
+@pytest.mark.asyncio
+async def test_verify_frbac_delegation_invalid(client):
+    """Test FRBAC delegation with invalid paths"""
+    response = await client.post(
+        "/api/v1/e8/verify",
+        json={
+            "master_path": "invalid",
+            "delegate_path": "invalid"
+        }
+    )
+    assert response.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_shortest_path(client):
     """Test shortest path computation"""
-    response = client.post(
+    response = await client.post(
         "/api/v1/e8/path",
         json={
             "from_path": "m/44'/0'/0'",
@@ -65,9 +94,23 @@ def test_shortest_path():
     assert len(data["path"]) > 0
 
 
-def test_weyl_orbit():
+@pytest.mark.asyncio
+async def test_shortest_path_invalid(client):
+    """Test shortest path with invalid paths"""
+    response = await client.post(
+        "/api/v1/e8/path",
+        json={
+            "from_path": "invalid",
+            "to_path": "invalid"
+        }
+    )
+    assert response.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_weyl_orbit(client):
     """Test Weyl orbit computation"""
-    response = client.post(
+    response = await client.post(
         "/api/v1/e8/weyl-orbit",
         json={
             "path": "m/44'/0'/0'",
@@ -81,9 +124,23 @@ def test_weyl_orbit():
     assert data["size"] <= 10
 
 
-def test_distance_metrics():
+@pytest.mark.asyncio
+async def test_weyl_orbit_invalid(client):
+    """Test Weyl orbit with invalid path"""
+    response = await client.post(
+        "/api/v1/e8/weyl-orbit",
+        json={
+            "path": "invalid",
+            "max_size": 10
+        }
+    )
+    assert response.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_distance_metrics(client):
     """Test distance metrics computation"""
-    response = client.post(
+    response = await client.post(
         "/api/v1/e8/distance",
         json={
             "master_path": "m/44'/0'/0'",
@@ -99,9 +156,23 @@ def test_distance_metrics():
     assert "weyl_distance" in data
 
 
-def test_theta_coefficient():
+@pytest.mark.asyncio
+async def test_distance_metrics_invalid(client):
+    """Test distance metrics with invalid paths"""
+    response = await client.post(
+        "/api/v1/e8/distance",
+        json={
+            "master_path": "invalid",
+            "delegate_path": "invalid"
+        }
+    )
+    assert response.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_theta_coefficient(client):
     """Test theta series coefficient lookup"""
-    response = client.get("/api/v1/e8-theta/coefficient/1")
+    response = await client.get("/api/v1/e8-theta/coefficient/1")
     assert response.status_code == 200
     data = response.json()
     assert "n" in data
@@ -110,9 +181,18 @@ def test_theta_coefficient():
     assert data["r_e8"] >= 240
 
 
-def test_qqf_link():
+@pytest.mark.asyncio
+async def test_theta_coefficient_invalid(client):
+    """Test theta coefficient with invalid n"""
+    response = await client.get("/api/v1/e8-theta/coefficient/-1")
+    # Should handle invalid input
+    assert response.status_code in [200, 400, 404]
+
+
+@pytest.mark.asyncio
+async def test_qqf_link(client):
     """Test QQF linkage"""
-    response = client.post(
+    response = await client.post(
         "/api/v1/e8-theta/qqf-link",
         json={
             "matrix": [
@@ -131,9 +211,23 @@ def test_qqf_link():
     assert "ramanujan_type" in data
 
 
-def test_quorum_stability():
+@pytest.mark.asyncio
+async def test_qqf_link_invalid_matrix(client):
+    """Test QQF link with invalid matrix"""
+    response = await client.post(
+        "/api/v1/e8-theta/qqf-link",
+        json={
+            "matrix": [[1.0]]  # Invalid size
+        }
+    )
+    # Should handle invalid input
+    assert response.status_code in [200, 400]
+
+
+@pytest.mark.asyncio
+async def test_quorum_stability(client):
     """Test quorum stability prediction"""
-    response = client.post(
+    response = await client.post(
         "/api/v1/e8-theta/stability",
         json={
             "voter_features": [
@@ -150,6 +244,19 @@ def test_quorum_stability():
     assert "theta_growth" in data
     assert "form_type" in data
     assert 0 <= data["stability_score"] <= 1
+
+
+@pytest.mark.asyncio
+async def test_quorum_stability_invalid(client):
+    """Test quorum stability with invalid features"""
+    response = await client.post(
+        "/api/v1/e8-theta/stability",
+        json={
+            "voter_features": []  # Empty list
+        }
+    )
+    # Should handle invalid input
+    assert response.status_code in [200, 400]
 
 
 if __name__ == "__main__":
